@@ -1,1 +1,4 @@
 clearvoice
+pyside6
+gradio
+streamlit
