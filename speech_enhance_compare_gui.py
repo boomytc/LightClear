@@ -27,7 +27,8 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                                QHBoxLayout, QLabel, QPushButton, QFileDialog, 
                                QProgressBar, QTextEdit, QGroupBox, QGridLayout,
                                QFrame, QMessageBox, QSplitter, QTabWidget,
-                               QScrollArea, QComboBox, QSlider, QCheckBox)
+                               QScrollArea, QComboBox, QSlider, QCheckBox,
+                               QTableWidget, QTableWidgetItem, QHeaderView)
 from PySide6.QtCore import Qt, QThread, Signal, QTimer
 from PySide6.QtGui import QFont, QIcon, QPalette, QColor, QPixmap
 
@@ -241,21 +242,38 @@ class AudioVisualizationWidget(QWidget):
         """设置质量指标标签页"""
         layout = QVBoxLayout(self.metrics_tab)
         
-        # 指标显示区域
-        self.metrics_text = QTextEdit()
-        self.metrics_text.setReadOnly(True)
-        self.metrics_text.setStyleSheet("""
-            QTextEdit {
+        # 指标显示区域 - 使用表格
+        self.metrics_table = QTableWidget()
+        self.metrics_table.setColumnCount(5)
+        self.metrics_table.setHorizontalHeaderLabels(['指标类别', '原始音频', '增强音频', '变化量', '变化说明'])
+        
+        # 设置表格样式
+        self.metrics_table.setStyleSheet("""
+            QTableWidget {
                 background-color: #f8f9fa;
                 border: 1px solid #dee2e6;
                 border-radius: 4px;
-                padding: 10px;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
+                gridline-color: #dee2e6;
+            }
+            QTableWidget::item {
+                padding: 8px;
+                border-bottom: 1px solid #dee2e6;
+            }
+            QHeaderView::section {
+                background-color: #e9ecef;
+                border: 1px solid #dee2e6;
+                padding: 8px;
+                font-weight: bold;
             }
         """)
         
-        layout.addWidget(self.metrics_text)
+        # 设置表格属性
+        self.metrics_table.setAlternatingRowColors(True)
+        self.metrics_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.metrics_table.verticalHeader().setVisible(False)
+        self.metrics_table.horizontalHeader().setStretchLastSection(True)
+        
+        layout.addWidget(self.metrics_table)
         
     def set_audio_data(self, original_path, enhanced_path):
         """设置音频数据"""
@@ -396,68 +414,67 @@ class AudioVisualizationWidget(QWidget):
             self.original_audio, self.enhanced_audio, self.sample_rate
         )
         
-        # 格式化显示
-        metrics_text = "=" * 60 + "\n"
-        metrics_text += "                    音频质量分析报告\n"
-        metrics_text += "=" * 60 + "\n\n"
+        # 准备表格数据
+        table_data = []
         
         # 基本信息
-        metrics_text += "📊 基本信息:\n"
-        metrics_text += f"   音频时长: {metrics.get('duration', 0):.2f} 秒\n"
-        metrics_text += f"   采样率: {self.sample_rate} Hz\n\n"
+        table_data.append(('音频时长 (秒)', f"{metrics.get('duration', 0):.2f}", f"{metrics.get('duration', 0):.2f}", "无变化", "时长保持不变"))
+        table_data.append(('采样率 (Hz)', f"{self.sample_rate}", f"{self.sample_rate}", "无变化", "采样率保持不变"))
         
         # 能量分析
-        metrics_text += "⚡ 能量分析:\n"
-        metrics_text += f"   原始RMS能量: {metrics.get('original_rms', 0):.4f}\n"
-        metrics_text += f"   增强RMS能量: {metrics.get('enhanced_rms', 0):.4f}\n"
-        energy_change = ((metrics.get('enhanced_rms', 0) / (metrics.get('original_rms', 1) + 1e-10)) - 1) * 100
-        metrics_text += f"   能量变化: {energy_change:.2f}%\n\n"
+        original_rms = metrics.get('original_rms', 0)
+        enhanced_rms = metrics.get('enhanced_rms', 0)
+        energy_change = ((enhanced_rms / (original_rms + 1e-10)) - 1) * 100 if original_rms > 0 else 0
+        energy_desc = "能量适度降低，噪声抑制良好" if energy_change < -30 else "能量略有降低，噪声得到控制" if energy_change < 0 else "能量增加，可能增强了信号强度"
+        table_data.append(('RMS能量', f"{original_rms:.4f}", f"{enhanced_rms:.4f}", f"{energy_change:+.2f}%", energy_desc))
         
         # 峰值分析
-        metrics_text += "📈 峰值分析:\n"
-        metrics_text += f"   原始峰值: {metrics.get('original_peak', 0):.4f}\n"
-        metrics_text += f"   增强峰值: {metrics.get('enhanced_peak', 0):.4f}\n"
-        peak_change = ((metrics.get('enhanced_peak', 0) / (metrics.get('original_peak', 1) + 1e-10)) - 1) * 100
-        metrics_text += f"   峰值变化: {peak_change:.2f}%\n\n"
+        original_peak = metrics.get('original_peak', 0)
+        enhanced_peak = metrics.get('enhanced_peak', 0)
+        peak_change = ((enhanced_peak / (original_peak + 1e-10)) - 1) * 100 if original_peak > 0 else 0
+        peak_desc = "峰值显著降低，噪声峰值被有效抑制" if peak_change < -30 else "峰值适度降低，信号更加平滑" if peak_change < 0 else "峰值增加，信号得到增强"
+        table_data.append(('峰值', f"{original_peak:.4f}", f"{enhanced_peak:.4f}", f"{peak_change:+.2f}%", peak_desc))
         
         # 动态范围
-        metrics_text += "📊 动态范围:\n"
-        metrics_text += f"   原始动态范围: {metrics.get('original_dynamic_range', 0):.2f} dB\n"
-        metrics_text += f"   增强动态范围: {metrics.get('enhanced_dynamic_range', 0):.2f} dB\n"
-        dr_improvement = metrics.get('enhanced_dynamic_range', 0) - metrics.get('original_dynamic_range', 0)
-        metrics_text += f"   动态范围改善: {dr_improvement:.2f} dB\n\n"
+        original_dr = metrics.get('original_dynamic_range', 0)
+        enhanced_dr = metrics.get('enhanced_dynamic_range', 0)
+        dr_improvement = enhanced_dr - original_dr
+        dr_desc = "动态范围显著改善，音频层次更丰富" if dr_improvement > 2 else "动态范围略有改善，音质有所提升" if dr_improvement > 0 else "动态范围基本保持，处理较为保守"
+        table_data.append(('动态范围 (dB)', f"{original_dr:.2f}", f"{enhanced_dr:.2f}", f"{dr_improvement:+.2f} dB", dr_desc))
         
         # 信噪比分析
-        metrics_text += "🔊 信噪比分析:\n"
-        metrics_text += f"   信噪比改善: {metrics.get('snr_improvement', 0):.2f} dB\n\n"
+        snr_improvement = metrics.get('snr_improvement', 0)
+        snr_desc = "信噪比显著改善，噪声抑制效果优秀" if snr_improvement > 5 else "信噪比适度改善，噪声得到良好控制" if snr_improvement > 0 else "信噪比略有下降，可能过度处理" if snr_improvement < -2 else "信噪比基本保持"
+        table_data.append(('信噪比改善 (dB)', '-', f"{snr_improvement:.2f}", f"{snr_improvement:+.2f} dB", snr_desc))
         
         # 频谱分析
-        metrics_text += "🎵 频谱分析:\n"
-        metrics_text += f"   原始谱质心: {metrics.get('original_spectral_centroid', 0):.2f} Hz\n"
-        metrics_text += f"   增强谱质心: {metrics.get('enhanced_spectral_centroid', 0):.2f} Hz\n\n"
+        original_centroid = metrics.get('original_spectral_centroid', 0)
+        enhanced_centroid = metrics.get('enhanced_spectral_centroid', 0)
+        centroid_change = enhanced_centroid - original_centroid
+        centroid_desc = "频谱质心上移，高频成分增强，清晰度提升" if centroid_change > 100 else "频谱质心略有上移，音质略有改善" if centroid_change > 0 else "频谱质心下移，高频成分减少，可能过度滤波"
+        table_data.append(('谱质心 (Hz)', f"{original_centroid:.2f}", f"{enhanced_centroid:.2f}", f"{centroid_change:+.2f} Hz", centroid_desc))
         
         # 其他特征
-        metrics_text += "🔍 其他特征:\n"
-        metrics_text += f"   原始零交叉率: {metrics.get('original_zcr', 0):.4f}\n"
-        metrics_text += f"   增强零交叉率: {metrics.get('enhanced_zcr', 0):.4f}\n\n"
+        original_zcr = metrics.get('original_zcr', 0)
+        enhanced_zcr = metrics.get('enhanced_zcr', 0)
+        zcr_change = ((enhanced_zcr / (original_zcr + 1e-10)) - 1) * 100 if original_zcr > 0 else 0
+        zcr_desc = "零交叉率显著降低，噪声和毛刺明显减少" if zcr_change < -30 else "零交叉率适度降低，信号更加平滑" if zcr_change < 0 else "零交叉率基本保持，信号特征稳定"
+        table_data.append(('零交叉率', f"{original_zcr:.4f}", f"{enhanced_zcr:.4f}", f"{zcr_change:+.2f}%", zcr_desc))
         
-        # 质量评估
-        metrics_text += "🎯 质量评估:\n"
-        snr_improvement = metrics.get('snr_improvement', 0)
-        if snr_improvement > 10:
-            quality_rating = "优秀"
-        elif snr_improvement > 5:
-            quality_rating = "良好"
-        elif snr_improvement > 0:
-            quality_rating = "一般"
-        else:
-            quality_rating = "需要改进"
+        # 设置表格行数
+        self.metrics_table.setRowCount(len(table_data))
         
-        metrics_text += f"   整体质量: {quality_rating}\n"
-        stars = min(5, max(1, int(abs(snr_improvement) / 2)))
-        metrics_text += f"   推荐度: {'★' * stars}{'☆' * (5 - stars)}\n"
+        # 填充表格数据
+        for row, (metric_name, original_value, enhanced_value, change_value, description) in enumerate(table_data):
+            self.metrics_table.setItem(row, 0, QTableWidgetItem(metric_name))
+            self.metrics_table.setItem(row, 1, QTableWidgetItem(original_value))
+            self.metrics_table.setItem(row, 2, QTableWidgetItem(enhanced_value))
+            self.metrics_table.setItem(row, 3, QTableWidgetItem(change_value))
+            self.metrics_table.setItem(row, 4, QTableWidgetItem(description))
         
-        self.metrics_text.setText(metrics_text)
+        # 调整列宽
+        self.metrics_table.resizeColumnsToContents()
+        self.metrics_table.horizontalHeader().setStretchLastSection(True)
 
 
 class AudioEnhancementWorker(QThread):
