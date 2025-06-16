@@ -3,3 +3,8 @@ pyside6
 gradio
 streamlit
 typing_extensions
+matplotlib
+plotly
+librosa
+soundfile
+numpy
