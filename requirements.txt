@@ -8,3 +8,4 @@ plotly
 librosa
 soundfile
 numpy
+scipy
