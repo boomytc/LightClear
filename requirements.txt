@@ -2,3 +2,4 @@ clearvoice
 pyside6
 gradio
 streamlit
+typing_extensions
