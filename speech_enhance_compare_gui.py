@@ -13,6 +13,18 @@ from matplotlib.figure import Figure
 from scipy import signal
 import io
 
+# 配置matplotlib使用SimHei字体
+import matplotlib.font_manager as fm
+
+font_path = os.path.join(os.path.dirname(__file__), 'assets', 'fonts', 'SimHei.ttf')
+# 直接注册字体到matplotlib
+fm.fontManager.addfont(font_path)
+# 创建字体属性对象
+font_prop = fm.FontProperties(fname=font_path)
+# 设置字体配置
+plt.rcParams['font.sans-serif'] = [font_prop.get_name()]
+plt.rcParams['axes.unicode_minus'] = False
+
 # 兼容性修复：为Python < 3.11添加Self支持
 try:
     from typing import Self
@@ -38,7 +50,6 @@ try:
 except Exception as e:
     print(f"警告：ClearVoice导入时出现问题: {e}")
     ClearVoice = None
-
 
 class AudioAnalyzer:
     """音频分析工具类"""
