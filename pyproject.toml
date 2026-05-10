@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "light-clearvoice"
+version = "0.5.0"
+description = "LightASR ClearVoice speech enhancement, separation, and super-resolution module"
+requires-python = ">=3.10"
+dependencies = [
+  "einops",
+  "joblib",
+  "librosa",
+  "numpy",
+  "opencv-python==4.10.0.84",
+  "packaging",
+  "pydub",
+  "python_speech_features==0.6",
+  "rotary_embedding_torch==0.8.3",
+  "scenedetect>=0.6.6",
+  "scikit_learn",
+  "scipy>=1.10.1",
+  "soundfile>=0.12.1",
+  "torch>=2.0.1; sys_platform != 'win32'",
+  "torchaudio>=2.0.2; sys_platform != 'win32'",
+  "torchinfo",
+  "torch-complex>=0.4.4",
+  "tqdm",
+  "yamlargparse",
+  "pesq==0.0.4",
+  "pystoi==0.3.3",
+  "pyyaml",
+  "pysptk",
+  "pymcd",
+  "pyworld",
+  "fastdtw",
+  "museval",
+  "resampy",
+  "onnxruntime",
+  "gammatone",
+  "mir_eval==0.7",
+  "tensorboard==2.14.0",
+  "typeguard==4.3.0",
+  "xls_r_sqa",
+]
+
+[project.optional-dependencies]
+gui = ["pyside6"]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["third_party"]
+include = ["clearvoice*"]
+
+[tool.setuptools.package-data]
+"clearvoice" = ["config/**/*.yaml", "config/**/*.json"]
