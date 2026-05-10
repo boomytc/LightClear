@@ -51,8 +51,8 @@ class ClearVoice:
         
     def call_t2t_mode(self, input_data):
         if len(self.models) > 1:
-    	    print('This tensor-to-tensor mode supports only one model!')
-    	    return
+            print('This tensor-to-tensor mode supports only one model!')
+            return
         else:
             return self.models[0].decode_data(input_data)
                 
@@ -69,7 +69,7 @@ class ClearVoice:
             else:
                 return results
         else:
-       	    return
+            return
                
     def write(self, results, output_path):
         add_subdir = False
