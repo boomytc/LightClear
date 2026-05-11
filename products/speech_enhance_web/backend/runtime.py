@@ -11,7 +11,7 @@ import time
 AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "MossFormer2_SE_48K"
 TASK_NAME = "speech_enhancement"
-DEFAULT_OUTPUT_DIR = "outputs/mossformer2_se_web/enhanced"
+DEFAULT_OUTPUT_DIR = "outputs/speech_enhance_web/enhanced"
 
 
 @dataclass

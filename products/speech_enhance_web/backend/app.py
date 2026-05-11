@@ -32,7 +32,7 @@ from .runtime import (
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 APP_DIR = Path(__file__).resolve().parents[1]
 FRONTEND_DIR = APP_DIR / "frontend"
-APP_OUTPUT_ROOT = PROJECT_ROOT / "outputs" / "mossformer2_se_web"
+APP_OUTPUT_ROOT = PROJECT_ROOT / "outputs" / "speech_enhance_web"
 UPLOAD_DIR = APP_OUTPUT_ROOT / "uploads"
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 
@@ -47,7 +47,7 @@ class JobRecord:
     analysis: dict[str, object]
 
 
-app = FastAPI(title="LightClear MossFormer2 SE Web", version="1.0.0")
+app = FastAPI(title="LightClear Speech Enhance Web", version="1.0.0")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 _model_handle: ModelHandle | None = None
@@ -149,7 +149,7 @@ def health() -> dict[str, object]:
     checkpoint_dir = model_checkpoint_dir(PROJECT_ROOT)
     samples = list_sample_audio(PROJECT_ROOT)
     return {
-        "app": "mossformer2_se_web",
+        "app": "speech_enhance_web",
         "model_name": "MossFormer2_SE_48K",
         "task": "speech_enhancement",
         "model_available": model_is_available(PROJECT_ROOT),

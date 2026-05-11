@@ -38,7 +38,7 @@
 - `models/sr_models/`：语音超分辨率模型目录。
 - `models/*/models.txt`：模型下载和本地目录索引，不等于本地权重一定已经完整存在。
 - `demo/`：公开能力 demo，展示 ClearVoice 的真实加载、输入、推理和输出路径。
-- `playground/mossformer2_se_web/`：唯一 playground WebUI，面向 MossFormer2_SE_48K；后端提供 FastAPI `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
+- `products/speech_enhance_web/`：当前语音增强 WebUI，默认面向 MossFormer2_SE_48K；后端提供 FastAPI `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
 - `outputs/`：demo / WebUI 默认输出目录，可按需清理。
 
 ## Model And Task Boundaries
@@ -71,21 +71,21 @@
 - 单个 demo 不要求覆盖全部能力；多个 demo 合起来应能充分体现文件输入、目录输入、`.scp` 输入、numpy/tensor 输入、语音增强、语音分离、语音超分辨率和目标说话人提取等用法。
 - 新增 demo 时优先补齐缺失的真实公开路径，例如批量输入、目录输入、`.scp` 输入、numpy 到 numpy、不同模型任务、参数控制或模型特有能力。
 - 不要在 demo 中增加 Hugging Face / ModelScope 下载流程、训练流程或微调流程，除非用户明确要求；默认只针对已放入 `models/` 的本地模型做加载推理。
-- `playground/` 和 WebUI 入口可以使用函数、类和模块拆分；上述无函数封装规则只强制适用于 `demo/` 下作为主要能力证明的 `.py` 脚本。
+- `products/` 下的 WebUI 入口可以使用函数、类和模块拆分；上述无函数封装规则只强制适用于 `demo/` 下作为主要能力证明的 `.py` 脚本。
 
-## Playground Rules
+## Product WebUI Rules
 
-- FastAPI WebUI 是当前唯一 playground 入口：
-  - `.venv/bin/uvicorn playground.mossformer2_se_web.backend.app:app --host 127.0.0.1 --port 7860`
+- FastAPI WebUI 是当前唯一产品入口：
+  - `.venv/bin/uvicorn products.speech_enhance_web.backend.app:app --host 127.0.0.1 --port 7860`
 - FastAPI WebUI 依赖 `fastapi`、`uvicorn`、`python-multipart` 和 `matplotlib`，运行前使用 `uv pip install -e ".[web]"`。
-- FastAPI WebUI 后端接口放在 `playground/mossformer2_se_web/backend/`，前端静态资源放在 `playground/mossformer2_se_web/frontend/`；不要把接口逻辑写进前端脚本。
-- FastAPI WebUI 输出默认写入 `outputs/mossformer2_se_web/`，上传文件缓存写入该目录下的 `uploads/`。
-- WebUI 当前围绕 `MossFormer2_SE_48K` 语音增强；不要在没有需求时扩展成全模型管理平台。
+- FastAPI WebUI 后端接口放在 `products/speech_enhance_web/backend/`，前端静态资源放在 `products/speech_enhance_web/frontend/`；不要把接口逻辑写进前端脚本。
+- FastAPI WebUI 输出默认写入 `outputs/speech_enhance_web/`，上传文件缓存写入该目录下的 `uploads/`。
+- `products/speech_enhance_web/` 当前围绕语音增强任务，默认使用 `MossFormer2_SE_48K`；后续新增 SS/SR WebUI 时优先在 `products/` 下建立独立产品入口，不要把当前入口扩展成全模型管理平台。
 
 ## Third Party Rules
 
 - `third_party/clearvoice` 是 vendored 运行时，非必要不要直接修改上游模型实现。
-- 优先在 `demo/`、`playground/` 或项目边界层做路径和入口适配。
+- 优先在 `demo/`、`products/` 或项目边界层做路径和入口适配。
 - 如果行为变更必须进入 `third_party/clearvoice`，保持改动最小，并同步检查所有受影响 demo。
 - `network_wrapper.py` 根据 task/model 加载配置和网络类；修改任务名、模型名或配置路径时，要把模型索引和 demo 一起更新。
 - 不要引入额外的二次封装层来替代 `ClearVoice` 公共入口，除非用户明确要求产品化 API。
@@ -94,7 +94,7 @@
 
 - 轻量语法校验：
   - `.venv/bin/python -m py_compile demo/*.py`
-  - `.venv/bin/python -m py_compile playground/mossformer2_se_web/backend/*.py`
+  - `.venv/bin/python -m py_compile products/speech_enhance_web/backend/*.py`
 - 基础导入校验：
   - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"`
 - 常用 demo 验证：
@@ -110,4 +110,4 @@
 - 如果环境创建方式、模型目录、配置路径、demo 规范、WebUI 入口或输出目录发生变化，同步更新本文件。
 - 如果修改 `pyproject.toml` 的包发现规则，确认 `clearvoice` 仍能从 `.venv/bin/python` 直接导入。
 - 如果新增 README 或部署说明，内容应贴合当前脚本和真实入口，不要保留不存在的 CLI、服务端或云端能力。
-- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `playground/mossformer2_se_web/` 的公开入口；只清理明确的缓存、输出和临时文件。
+- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `products/speech_enhance_web/` 的公开入口；只清理明确的缓存、输出和临时文件。
