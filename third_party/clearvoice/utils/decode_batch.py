@@ -391,7 +391,7 @@ def decode_one_audio_mossformer2_se_48k(model, device, inputs, args):
                     if batch_idx == 0:
                         batch_fbanks = fbanks
                     else:
-                    	batch_fbanks = torch.cat([batch_fbanks, fbanks], dim=0)
+                        batch_fbanks = torch.cat([batch_fbanks, fbanks], dim=0)
                 # Pass filter banks through the model
                 Out_List = model(batch_fbanks)
                 pred_mask = Out_List[-1]  # Get the predicted mask from the output
@@ -436,7 +436,7 @@ def decode_one_audio_mossformer2_se_48k(model, device, inputs, args):
             if batch_idx == 0:
                 fbanks_batch = fbanks
             else:
-                fbanks_batch = torch.cat([fbanks_batch, fbanks], dim=0)	
+                fbanks_batch = torch.cat([fbanks_batch, fbanks], dim=0)    
 
         # Pass filter banks through the model
         Out_List = model(fbanks_batch)
@@ -454,7 +454,7 @@ def decode_one_audio_mossformer2_se_48k(model, device, inputs, args):
             else:
                 outputs_tmp = istft(masked_spec_complex, args, len(audio[batch_idx,:]))
                 outputs_tmp = outputs_tmp.unsqueeze(0)
-                outputs = torch.cat([outputs, outputs_tmp], dim=0)	
+                outputs = torch.cat([outputs, outputs_tmp], dim=0)    
         """
         audio = torch.from_numpy(inputs).type(torch.FloatTensor)
         fbanks = compute_fbank(audio.unsqueeze(0), args)
