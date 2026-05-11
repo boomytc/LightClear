@@ -14,6 +14,7 @@
 - 依赖安装到本项目环境内：
   - 基础运行：`uv pip install -e .`
   - GUI 运行：`uv pip install -e ".[gui]"`
+  - Streamlit WebUI 运行：`uv pip install -e ".[streamlit]"`
 - `pyproject.toml` 允许 `>=3.10`，但本项目实际协作和验证默认按 Python 3.12 处理。
 - macOS 或无 NVIDIA GPU 机器按 CPU 环境做链路验证；不要默认假设 CUDA 可用。
 - 如果需要 CUDA，先确认目标机器、PyTorch wheel 和 `torch.cuda.is_available()`，再运行依赖 GPU 的实际推理。
@@ -39,6 +40,7 @@
 - `models/*/models.txt`：模型下载和本地目录索引，不等于本地权重一定已经完整存在。
 - `demo/`：公开能力 demo，展示 ClearVoice 的真实加载、输入、推理和输出路径。
 - `playground/mossformer2_se_gui/`：PySide6 GUI，目前面向 MossFormer2_SE_48K 语音增强和对比分析。
+- `playground/mossformer2_se_streamlit_webui/`：Streamlit WebUI，提供浏览器版 MossFormer2_SE_48K 上传、增强、播放和对比分析。
 - `outputs/`：demo / GUI 默认输出目录，可按需清理。
 
 ## Model And Task Boundaries
@@ -81,6 +83,10 @@
 - GUI 依赖 PySide6，运行前使用 `uv pip install -e ".[gui]"`。
 - GUI 当前围绕 `MossFormer2_SE_48K` 语音增强；不要在没有需求时扩展成全模型管理平台。
 - GUI 内部可维护窗口、worker、可视化和分析工具类；不要把 GUI 架构规则强行套到 `demo/`。
+- Streamlit WebUI 入口：
+  - `.venv/bin/streamlit run playground/mossformer2_se_streamlit_webui/app.py`
+- Streamlit WebUI 依赖 `streamlit` 和 `matplotlib`，运行前使用 `uv pip install -e ".[streamlit]"`。
+- Streamlit WebUI 输出默认写入 `outputs/mossformer2_se_streamlit_webui/`，上传文件缓存写入该目录下的 `uploads/`。
 
 ## Third Party Rules
 
@@ -96,6 +102,7 @@
   - `.venv/bin/python -m py_compile demo/*.py`
   - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/common/*.py`
   - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/speech_enhance/*.py playground/mossformer2_se_gui/speech_enhance_compare/*.py`
+  - `.venv/bin/python -m py_compile playground/mossformer2_se_streamlit_webui/*.py`
 - 基础导入校验：
   - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"`
 - 常用 demo 验证：

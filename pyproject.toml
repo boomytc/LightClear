@@ -46,6 +46,10 @@ dependencies = [
 
 [project.optional-dependencies]
 gui = ["pyside6"]
+streamlit = [
+  "matplotlib>=3.8",
+  "streamlit>=1.45",
+]
 
 [tool.setuptools]
 include-package-data = true
