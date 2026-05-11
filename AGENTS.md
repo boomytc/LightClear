@@ -38,7 +38,9 @@
 - `models/sr_models/`：语音超分辨率模型目录。
 - `models/*/models.txt`：模型下载和本地目录索引，不等于本地权重一定已经完整存在。
 - `demo/`：公开能力 demo，展示 ClearVoice 的真实加载、输入、推理和输出路径。
-- `products/speech_enhance_web/`：当前语音增强 WebUI，默认面向 MossFormer2_SE_48K；后端提供 FastAPI `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
+- `products/speech_enhance_web/`：语音增强 WebUI，默认面向 MossFormer2_SE_48K；后端提供 FastAPI `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
+- `products/speech_separation_web/`：语音分离 WebUI，默认面向 MossFormer2_SS_16K；输出两路说话人分离结果。
+- `products/speech_super_resolution_web/`：语音超分辨率 WebUI，默认面向 MossFormer2_SR_48K。
 - `outputs/`：demo / WebUI 默认输出目录，可按需清理。
 
 ## Model And Task Boundaries
@@ -75,12 +77,14 @@
 
 ## Product WebUI Rules
 
-- FastAPI WebUI 是当前唯一产品入口：
+- FastAPI WebUI 当前产品入口：
   - `.venv/bin/uvicorn products.speech_enhance_web.backend.app:app --host 127.0.0.1 --port 7860`
+  - `.venv/bin/uvicorn products.speech_separation_web.backend.app:app --host 127.0.0.1 --port 7860`
+  - `.venv/bin/uvicorn products.speech_super_resolution_web.backend.app:app --host 127.0.0.1 --port 7860`
 - FastAPI WebUI 依赖 `fastapi`、`uvicorn`、`python-multipart` 和 `matplotlib`，运行前使用 `uv pip install -e ".[web]"`。
-- FastAPI WebUI 后端接口放在 `products/speech_enhance_web/backend/`，前端静态资源放在 `products/speech_enhance_web/frontend/`；不要把接口逻辑写进前端脚本。
-- FastAPI WebUI 输出默认写入 `outputs/speech_enhance_web/`，上传文件缓存写入该目录下的 `uploads/`。
-- `products/speech_enhance_web/` 当前围绕语音增强任务，默认使用 `MossFormer2_SE_48K`；后续新增 SS/SR WebUI 时优先在 `products/` 下建立独立产品入口，不要把当前入口扩展成全模型管理平台。
+- FastAPI WebUI 后端接口放在各产品的 `backend/`，前端静态资源放在各产品的 `frontend/`；不要把接口逻辑写进前端脚本。
+- FastAPI WebUI 输出默认写入各产品自己的 `outputs/<product>/`，上传文件缓存写入该目录下的 `uploads/`。
+- SE/SS/SR WebUI 按任务拆成独立 `products/` 入口；不要把某个入口扩展成全模型管理平台。
 
 ## Third Party Rules
 
@@ -94,7 +98,7 @@
 
 - 轻量语法校验：
   - `.venv/bin/python -m py_compile demo/*.py`
-  - `.venv/bin/python -m py_compile products/speech_enhance_web/backend/*.py`
+  - `.venv/bin/python -m py_compile products/*_web/backend/*.py`
 - 基础导入校验：
   - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"`
 - 常用 demo 验证：
@@ -110,4 +114,4 @@
 - 如果环境创建方式、模型目录、配置路径、demo 规范、WebUI 入口或输出目录发生变化，同步更新本文件。
 - 如果修改 `pyproject.toml` 的包发现规则，确认 `clearvoice` 仍能从 `.venv/bin/python` 直接导入。
 - 如果新增 README 或部署说明，内容应贴合当前脚本和真实入口，不要保留不存在的 CLI、服务端或云端能力。
-- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `products/speech_enhance_web/` 的公开入口；只清理明确的缓存、输出和临时文件。
+- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `products/*_web/` 的公开入口；只清理明确的缓存、输出和临时文件。
