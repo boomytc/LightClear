@@ -50,6 +50,12 @@ streamlit = [
   "matplotlib>=3.8",
   "streamlit>=1.45",
 ]
+web = [
+  "fastapi>=0.115",
+  "matplotlib>=3.8",
+  "python-multipart>=0.0.9",
+  "uvicorn[standard]>=0.30",
+]
 
 [tool.setuptools]
 include-package-data = true

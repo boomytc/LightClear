@@ -15,6 +15,7 @@
   - 基础运行：`uv pip install -e .`
   - GUI 运行：`uv pip install -e ".[gui]"`
   - Streamlit WebUI 运行：`uv pip install -e ".[streamlit]"`
+  - FastAPI WebUI 运行：`uv pip install -e ".[web]"`
 - `pyproject.toml` 允许 `>=3.10`，但本项目实际协作和验证默认按 Python 3.12 处理。
 - macOS 或无 NVIDIA GPU 机器按 CPU 环境做链路验证；不要默认假设 CUDA 可用。
 - 如果需要 CUDA，先确认目标机器、PyTorch wheel 和 `torch.cuda.is_available()`，再运行依赖 GPU 的实际推理。
@@ -41,6 +42,7 @@
 - `demo/`：公开能力 demo，展示 ClearVoice 的真实加载、输入、推理和输出路径。
 - `playground/mossformer2_se_gui/`：PySide6 GUI，目前面向 MossFormer2_SE_48K 语音增强和对比分析。
 - `playground/mossformer2_se_streamlit_webui/`：Streamlit WebUI，提供浏览器版 MossFormer2_SE_48K 上传、增强、播放和对比分析。
+- `playground/mossformer2_se_web/`：FastAPI 前后端分离 WebUI，后端提供 `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
 - `outputs/`：demo / GUI 默认输出目录，可按需清理。
 
 ## Model And Task Boundaries
@@ -87,6 +89,11 @@
   - `.venv/bin/streamlit run playground/mossformer2_se_streamlit_webui/app.py`
 - Streamlit WebUI 依赖 `streamlit` 和 `matplotlib`，运行前使用 `uv pip install -e ".[streamlit]"`。
 - Streamlit WebUI 输出默认写入 `outputs/mossformer2_se_streamlit_webui/`，上传文件缓存写入该目录下的 `uploads/`。
+- FastAPI WebUI 入口：
+  - `.venv/bin/uvicorn playground.mossformer2_se_web.backend.app:app --host 127.0.0.1 --port 7860`
+- FastAPI WebUI 依赖 `fastapi`、`uvicorn`、`python-multipart` 和 `matplotlib`，运行前使用 `uv pip install -e ".[web]"`。
+- FastAPI WebUI 后端接口放在 `playground/mossformer2_se_web/backend/`，前端静态资源放在 `playground/mossformer2_se_web/frontend/`；不要把接口逻辑写进前端脚本。
+- FastAPI WebUI 输出默认写入 `outputs/mossformer2_se_web/`，上传文件缓存写入该目录下的 `uploads/`。
 
 ## Third Party Rules
 
@@ -103,6 +110,7 @@
   - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/common/*.py`
   - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/speech_enhance/*.py playground/mossformer2_se_gui/speech_enhance_compare/*.py`
   - `.venv/bin/python -m py_compile playground/mossformer2_se_streamlit_webui/*.py`
+  - `.venv/bin/python -m py_compile playground/mossformer2_se_web/backend/*.py`
 - 基础导入校验：
   - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"`
 - 常用 demo 验证：
