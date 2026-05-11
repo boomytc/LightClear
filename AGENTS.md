@@ -3,7 +3,7 @@
 ## Scope
 
 - 本文件适用于 `/Users/boom/workspace/LightClear` 整个仓库。
-- 将本目录视为独立项目根目录，用于环境、安装、运行、demo、GUI、模型资源和输出文件。
+- 将本目录视为独立项目根目录，用于环境、安装、运行、demo、WebUI、模型资源和输出文件。
 - 不要把父级工作区或兄弟项目当作本项目的 Python 根目录。
 - 不要复用兄弟项目的 `.venv`、模型目录、临时文件或运行产物，除非用户明确要求跨项目处理。
 
@@ -13,8 +13,6 @@
 - 使用 `.venv/bin/python` 执行本项目代码。
 - 依赖安装到本项目环境内：
   - 基础运行：`uv pip install -e .`
-  - GUI 运行：`uv pip install -e ".[gui]"`
-  - Streamlit WebUI 运行：`uv pip install -e ".[streamlit]"`
   - FastAPI WebUI 运行：`uv pip install -e ".[web]"`
 - `pyproject.toml` 允许 `>=3.10`，但本项目实际协作和验证默认按 Python 3.12 处理。
 - macOS 或无 NVIDIA GPU 机器按 CPU 环境做链路验证；不要默认假设 CUDA 可用。
@@ -25,9 +23,9 @@
 - 运行命令前先进入项目根目录 `/Users/boom/workspace/LightClear`。
 - 优先使用项目相对路径，例如 `demo/...`、`assets/...`、`models/...`、`outputs/...`、`third_party/...`。
 - 不要在脚本里硬编码 `/Users/boom/...` 这类机器绝对路径。
-- demo 和 GUI 入口需要从项目根目录启动，确保 `assets/`、`models/`、`outputs/` 的相对路径一致。
+- demo 和 WebUI 入口需要从项目根目录启动，确保 `assets/`、`models/`、`outputs/` 的相对路径一致。
 - 运行产物默认写入 `outputs/`；这是可清理目录，不作为源码能力的一部分。
-- 不要把模型权重、缓存、生成音频、临时目录或 GUI 运行产物纳入版本控制。
+- 不要把模型权重、缓存、生成音频、临时目录或 WebUI 运行产物纳入版本控制。
 
 ## Project Layout
 
@@ -40,10 +38,8 @@
 - `models/sr_models/`：语音超分辨率模型目录。
 - `models/*/models.txt`：模型下载和本地目录索引，不等于本地权重一定已经完整存在。
 - `demo/`：公开能力 demo，展示 ClearVoice 的真实加载、输入、推理和输出路径。
-- `playground/mossformer2_se_gui/`：PySide6 GUI，目前面向 MossFormer2_SE_48K 语音增强和对比分析。
-- `playground/mossformer2_se_streamlit_webui/`：Streamlit WebUI，提供浏览器版 MossFormer2_SE_48K 上传、增强、播放和对比分析。
-- `playground/mossformer2_se_web/`：FastAPI 前后端分离 WebUI，后端提供 `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
-- `outputs/`：demo / GUI 默认输出目录，可按需清理。
+- `playground/mossformer2_se_web/`：唯一 playground WebUI，面向 MossFormer2_SE_48K；后端提供 FastAPI `/api/*` 接口，前端使用 HTML/CSS/JS/Tailwind 静态资源。
+- `outputs/`：demo / WebUI 默认输出目录，可按需清理。
 
 ## Model And Task Boundaries
 
@@ -75,25 +71,16 @@
 - 单个 demo 不要求覆盖全部能力；多个 demo 合起来应能充分体现文件输入、目录输入、`.scp` 输入、numpy/tensor 输入、语音增强、语音分离、语音超分辨率和目标说话人提取等用法。
 - 新增 demo 时优先补齐缺失的真实公开路径，例如批量输入、目录输入、`.scp` 输入、numpy 到 numpy、不同模型任务、参数控制或模型特有能力。
 - 不要在 demo 中增加 Hugging Face / ModelScope 下载流程、训练流程或微调流程，除非用户明确要求；默认只针对已放入 `models/` 的本地模型做加载推理。
-- `playground/` 和 GUI 入口可以使用 `main()`；上述无函数封装规则只强制适用于 `demo/` 下作为主要能力证明的 `.py` 脚本。
+- `playground/` 和 WebUI 入口可以使用函数、类和模块拆分；上述无函数封装规则只强制适用于 `demo/` 下作为主要能力证明的 `.py` 脚本。
 
 ## Playground Rules
 
-- GUI 入口：
-  - `.venv/bin/python playground/mossformer2_se_gui/speech_enhance/speech_enhance_main.py`
-  - `.venv/bin/python playground/mossformer2_se_gui/speech_enhance_compare/speech_enhance_compare_main.py`
-- GUI 依赖 PySide6，运行前使用 `uv pip install -e ".[gui]"`。
-- GUI 当前围绕 `MossFormer2_SE_48K` 语音增强；不要在没有需求时扩展成全模型管理平台。
-- GUI 内部可维护窗口、worker、可视化和分析工具类；不要把 GUI 架构规则强行套到 `demo/`。
-- Streamlit WebUI 入口：
-  - `.venv/bin/streamlit run playground/mossformer2_se_streamlit_webui/app.py`
-- Streamlit WebUI 依赖 `streamlit` 和 `matplotlib`，运行前使用 `uv pip install -e ".[streamlit]"`。
-- Streamlit WebUI 输出默认写入 `outputs/mossformer2_se_streamlit_webui/`，上传文件缓存写入该目录下的 `uploads/`。
-- FastAPI WebUI 入口：
+- FastAPI WebUI 是当前唯一 playground 入口：
   - `.venv/bin/uvicorn playground.mossformer2_se_web.backend.app:app --host 127.0.0.1 --port 7860`
 - FastAPI WebUI 依赖 `fastapi`、`uvicorn`、`python-multipart` 和 `matplotlib`，运行前使用 `uv pip install -e ".[web]"`。
 - FastAPI WebUI 后端接口放在 `playground/mossformer2_se_web/backend/`，前端静态资源放在 `playground/mossformer2_se_web/frontend/`；不要把接口逻辑写进前端脚本。
 - FastAPI WebUI 输出默认写入 `outputs/mossformer2_se_web/`，上传文件缓存写入该目录下的 `uploads/`。
+- WebUI 当前围绕 `MossFormer2_SE_48K` 语音增强；不要在没有需求时扩展成全模型管理平台。
 
 ## Third Party Rules
 
@@ -107,9 +94,6 @@
 
 - 轻量语法校验：
   - `.venv/bin/python -m py_compile demo/*.py`
-  - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/common/*.py`
-  - `.venv/bin/python -m py_compile playground/mossformer2_se_gui/speech_enhance/*.py playground/mossformer2_se_gui/speech_enhance_compare/*.py`
-  - `.venv/bin/python -m py_compile playground/mossformer2_se_streamlit_webui/*.py`
   - `.venv/bin/python -m py_compile playground/mossformer2_se_web/backend/*.py`
 - 基础导入校验：
   - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"`
@@ -119,11 +103,11 @@
   - `.venv/bin/python demo/demo_ss.py`
   - `.venv/bin/python demo/demo_Numpy2Numpy.py`
 - 运行完整推理前先确认对应模型权重目录存在，并与 `third_party/clearvoice/config/inference/*.yaml` 中的 `checkpoint_dir` 一致。
-- 如果环境缺少模型权重、GUI 依赖或音视频系统依赖，记录为环境限制，不要把静态校验误报为运行时能力已经通过。
+- 如果环境缺少模型权重、WebUI 依赖或音视频系统依赖，记录为环境限制，不要把静态校验误报为运行时能力已经通过。
 
 ## Maintenance
 
-- 如果环境创建方式、模型目录、配置路径、demo 规范、GUI 入口或输出目录发生变化，同步更新本文件。
+- 如果环境创建方式、模型目录、配置路径、demo 规范、WebUI 入口或输出目录发生变化，同步更新本文件。
 - 如果修改 `pyproject.toml` 的包发现规则，确认 `clearvoice` 仍能从 `.venv/bin/python` 直接导入。
 - 如果新增 README 或部署说明，内容应贴合当前脚本和真实入口，不要保留不存在的 CLI、服务端或云端能力。
-- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `playground/` 的公开入口；只清理明确的缓存、输出和临时文件。
+- 清理时保留 `demo/`、`assets/`、`models/*/models.txt`、`third_party/clearvoice/config/` 和 `playground/mossformer2_se_web/` 的公开入口；只清理明确的缓存、输出和临时文件。

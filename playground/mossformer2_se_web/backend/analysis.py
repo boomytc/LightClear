@@ -16,7 +16,7 @@ from scipy import signal
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
-FONT_PATH = PROJECT_ROOT / "playground" / "mossformer2_se_gui" / "assets" / "fonts" / "SimHei.ttf"
+FONT_PATH = Path(__file__).resolve().parent / "assets" / "fonts" / "SimHei.ttf"
 
 if FONT_PATH.exists():
     fm.fontManager.addfont(str(FONT_PATH))

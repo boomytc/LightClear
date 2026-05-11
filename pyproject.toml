@@ -45,11 +45,6 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-gui = ["pyside6"]
-streamlit = [
-  "matplotlib>=3.8",
-  "streamlit>=1.45",
-]
 web = [
   "fastapi>=0.115",
   "matplotlib>=3.8",
