@@ -4,7 +4,7 @@ use_cuda: 1 # 1 for True, 0 for False
 num_gpu: 1
 sampling_rate: 16000
 network: "FRCRN_SE_16K"  ##network type
-checkpoint_dir: "checkpoints/FRCRN_SE_16K"
+checkpoint_dir: "models/se_models/FRCRN_SE_16K"
 
 input_path: "samples/scp/cv_demand_testset_16k.scp"  # an input dir or input scp file
 output_dir: "outputs/FRCRN_SE_16K" ## output dir to store processed audio

@@ -4,7 +4,7 @@ use_cuda: 1 # 1 for True, 0 for False
 num_gpu: 1
 sampling_rate: 16000
 network: "AV_MossFormer2_TSE_16K"  # network type
-checkpoint_dir: "checkpoints/AV_MossFormer2_TSE_16K"
+checkpoint_dir: "models/se_models/AV_MossFormer2_TSE_16K"
 
 input_path: "scp/video_samples.scp"  # an input dir or input scp file
 output_dir: "path_to_output_videos_tse" # output dir to store processed audio
