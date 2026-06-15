@@ -2,16 +2,16 @@
 
 - MossFormer2_SE_48K
   下载页: https://www.modelscope.cn/models/alibabasglab/MossFormer2_SE_48K
-  本地目录: models/se_models/MossFormer2_SE_48K
+  中心目录: /Users/boom/Model/SE/MossFormer2_SE_48K
 
 - AV_MossFormer2_TSE_16K
   下载页: https://www.modelscope.cn/models/alibabasglab/AV_MossFormer2_TSE_16K
-  本地目录: models/se_models/AV_MossFormer2_TSE_16K
+  中心目录: /Users/boom/Model/SE/AV_MossFormer2_TSE_16K
 
 - FRCRN_SE_16K
   下载页: https://www.modelscope.cn/models/alibabasglab/FRCRN_SE_16K
-  本地目录: models/se_models/FRCRN_SE_16K
+  中心目录: /Users/boom/Model/SE/FRCRN_SE_16K
 
 - MossFormerGAN_SE_16K
   下载页: https://www.modelscope.cn/models/alibabasglab/MossFormerGAN_SE_16K
-  本地目录: models/se_models/MossFormerGAN_SE_16K
+  中心目录: /Users/boom/Model/SE/MossFormerGAN_SE_16K

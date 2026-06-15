@@ -4,8 +4,7 @@ use_cuda: 1 # 1 for True, 0 for False
 num_gpu: 1
 sampling_rate: 16000
 network: "MossFormerGAN_SE_16K"  ##network type
-# checkpoint_dir: "checkpoints/MossFormerGAN_SE_16K"
-checkpoint_dir: "models/se_models/MossFormerGAN_SE_16K"
+checkpoint_dir: "/Users/boom/Model/SE/MossFormerGAN_SE_16K"
 
 input_path: "assets/clearvoice_samples/scp/audio_samples.scp"
 output_dir: "outputs/MossFormerGAN_SE_16K" ## output dir to store processed audio

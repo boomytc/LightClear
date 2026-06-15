@@ -2,4 +2,4 @@
 
 - MossFormer2_SR_48K
   下载页: https://www.modelscope.cn/models/alibabasglab/MossFormer2_SR_48K
-  本地目录: models/sr_models/MossFormer2_SR_48K
+  中心目录: /Users/boom/Model/SR/MossFormer2_SR_48K

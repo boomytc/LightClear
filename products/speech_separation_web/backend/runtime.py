@@ -12,6 +12,7 @@ AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "MossFormer2_SS_16K"
 TASK_NAME = "speech_separation"
 DEFAULT_OUTPUT_DIR = "outputs/speech_separation_web/separated"
+MODEL_ROOT = Path("/Users/boom/Model/SS")
 SAMPLE_AUDIO_FILES = ("assets/clearvoice_samples/input_ss.wav",)
 SAMPLE_AUDIO_DIRS = ("assets/clearvoice_samples/path_to_input_wavs_ss",)
 NUM_SPEAKERS = 2
@@ -54,7 +55,7 @@ def load_mossformer2_ss(project_root: Path) -> ModelHandle:
 
 
 def model_checkpoint_dir(project_root: Path) -> Path:
-    return project_root / "models" / "ss_models" / MODEL_NAME
+    return MODEL_ROOT / MODEL_NAME
 
 
 def model_is_available(project_root: Path) -> bool:

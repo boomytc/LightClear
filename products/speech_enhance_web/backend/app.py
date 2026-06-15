@@ -58,7 +58,11 @@ _jobs_lock = threading.Lock()
 
 
 def project_relative(path: Path) -> str:
-    return str(path.resolve().relative_to(PROJECT_ROOT.resolve()))
+    resolved_path = path.resolve()
+    try:
+        return str(resolved_path.relative_to(PROJECT_ROOT.resolve()))
+    except ValueError:
+        return str(resolved_path)
 
 
 def get_model_handle() -> ModelHandle:

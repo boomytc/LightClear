@@ -12,6 +12,7 @@ AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "MossFormer2_SR_48K"
 TASK_NAME = "speech_super_resolution"
 DEFAULT_OUTPUT_DIR = "outputs/speech_super_resolution_web/super_resolved"
+MODEL_ROOT = Path("/Users/boom/Model/SR")
 SAMPLE_AUDIO_FILES = ("assets/clearvoice_samples/input_sr.wav",)
 SAMPLE_AUDIO_DIRS = ("assets/clearvoice_samples/path_to_input_wavs_sr",)
 
@@ -53,7 +54,7 @@ def load_mossformer2_sr(project_root: Path) -> ModelHandle:
 
 
 def model_checkpoint_dir(project_root: Path) -> Path:
-    return project_root / "models" / "sr_models" / MODEL_NAME
+    return MODEL_ROOT / MODEL_NAME
 
 
 def model_is_available(project_root: Path) -> bool:

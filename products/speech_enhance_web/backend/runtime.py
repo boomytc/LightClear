@@ -12,6 +12,7 @@ AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "MossFormer2_SE_48K"
 TASK_NAME = "speech_enhancement"
 DEFAULT_OUTPUT_DIR = "outputs/speech_enhance_web/enhanced"
+MODEL_ROOT = Path("/Users/boom/Model/SE")
 
 
 @dataclass
@@ -51,7 +52,7 @@ def load_mossformer2_se(project_root: Path) -> ModelHandle:
 
 
 def model_checkpoint_dir(project_root: Path) -> Path:
-    return project_root / "models" / "se_models" / MODEL_NAME
+    return MODEL_ROOT / MODEL_NAME
 
 
 def model_is_available(project_root: Path) -> bool:

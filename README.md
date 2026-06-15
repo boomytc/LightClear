@@ -14,10 +14,10 @@ from clearvoice import ClearVoice
 | --- | --- |
 | `pyproject.toml` | 项目依赖和打包配置；通过 `third_party/` 发现并安装 `clearvoice*` 包。 |
 | `third_party/clearvoice/` | ClearVoice 实际运行时、模型网络、数据处理、音视频工具和推理配置。 |
-| `third_party/clearvoice/config/inference/` | 各模型推理配置；其中 `checkpoint_dir` 必须和 `models/` 下的本地目录对应。 |
-| `models/se_models/` | 语音增强和目标说话人提取模型目录与下载索引。 |
-| `models/ss_models/` | 语音分离模型目录与下载索引。 |
-| `models/sr_models/` | 语音超分辨率模型目录与下载索引。 |
+| `third_party/clearvoice/config/inference/` | 各模型推理配置；其中 `checkpoint_dir` 默认指向 `/Users/boom/Model/{SE,SS,SR}/` 下的中心模型目录。 |
+| `models/se_models/` | 语音增强和目标说话人提取模型下载索引。 |
+| `models/ss_models/` | 语音分离模型下载索引。 |
+| `models/sr_models/` | 语音超分辨率模型下载索引。 |
 | `assets/clearvoice_samples/` | demo 和 WebUI 使用的示例音频、视频、目录输入和 `.scp` 输入。 |
 | `demo/` | 公开能力 demo，展示真实模型加载、输入构造、推理调用和输出路径。 |
 | `products/speech_enhance_web/` | 语音增强 WebUI，默认模型 `MossFormer2_SE_48K`。 |
@@ -49,18 +49,18 @@ uv pip install -e ".[web]"
 
 ## 模型目录
 
-`models/*/models.txt` 是模型下载和本地目录索引，不等于权重一定已经完整存在。完整推理前应先确认对应权重目录存在，并和 `third_party/clearvoice/config/inference/*.yaml` 中的 `checkpoint_dir` 一致。
+`models/*/models.txt` 是模型下载和中心目录索引，不存放真实权重，也不等于权重一定已经完整存在。完整推理前应先确认对应权重目录存在，并和 `third_party/clearvoice/config/inference/*.yaml` 中的 `checkpoint_dir` 一致。
 
 当前任务和模型边界：
 
-| 任务 | `task` | 模型 | 本地目录约定 |
+| 任务 | `task` | 模型 | 中心目录约定 |
 | --- | --- | --- | --- |
-| 语音增强 | `speech_enhancement` | `MossFormer2_SE_48K` | `models/se_models/MossFormer2_SE_48K` |
-| 语音增强 | `speech_enhancement` | `FRCRN_SE_16K` | `models/se_models/FRCRN_SE_16K` |
-| 语音增强 | `speech_enhancement` | `MossFormerGAN_SE_16K` | `models/se_models/MossFormerGAN_SE_16K` |
-| 语音分离 | `speech_separation` | `MossFormer2_SS_16K` | `models/ss_models/MossFormer2_SS_16K` |
-| 语音超分辨率 | `speech_super_resolution` | `MossFormer2_SR_48K` | `models/sr_models/MossFormer2_SR_48K` |
-| 音视频目标说话人提取 | `target_speaker_extraction` | `AV_MossFormer2_TSE_16K` | `models/se_models/AV_MossFormer2_TSE_16K` |
+| 语音增强 | `speech_enhancement` | `MossFormer2_SE_48K` | `/Users/boom/Model/SE/MossFormer2_SE_48K` |
+| 语音增强 | `speech_enhancement` | `FRCRN_SE_16K` | `/Users/boom/Model/SE/FRCRN_SE_16K` |
+| 语音增强 | `speech_enhancement` | `MossFormerGAN_SE_16K` | `/Users/boom/Model/SE/MossFormerGAN_SE_16K` |
+| 语音分离 | `speech_separation` | `MossFormer2_SS_16K` | `/Users/boom/Model/SS/MossFormer2_SS_16K` |
+| 语音超分辨率 | `speech_super_resolution` | `MossFormer2_SR_48K` | `/Users/boom/Model/SR/MossFormer2_SR_48K` |
+| 音视频目标说话人提取 | `target_speaker_extraction` | `AV_MossFormer2_TSE_16K` | `/Users/boom/Model/SE/AV_MossFormer2_TSE_16K` |
 
 ## Demo
 
@@ -135,7 +135,7 @@ demo 覆盖的主要输入形态包括：
 .venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice)"
 ```
 
-完整推理验证前，请先确认目标模型权重已经放在 `models/` 对应目录下。缺少权重、WebUI 依赖或 FFmpeg 时，应记录为环境限制，不要把静态校验等同于真实推理已通过。
+完整推理验证前，请先确认目标模型权重已经放在 `/Users/boom/Model/{SE,SS,SR}/` 对应目录下。缺少权重、WebUI 依赖或 FFmpeg 时，应记录为环境限制，不要把静态校验等同于真实推理已通过。
 
 ## 清理
 
@@ -145,4 +145,4 @@ demo 覆盖的主要输入形态包括：
 make clean
 ```
 
-`outputs/` 是 demo 和 WebUI 的默认输出目录；如需释放空间，可以按需清理其中生成的文件。`outputs/`、`.venv/`、`*.egg-info/`、`uv.lock` 和系统缓存文件不会作为源码能力纳入版本控制。
+`outputs/` 是 demo 和 WebUI 的默认输出目录；如需释放空间，可以按需清理其中生成的文件。`outputs/`、`.venv/`、`*.egg-info/`、`uv.lock`、项目内模型权重目录和系统缓存文件不会作为源码能力纳入版本控制。

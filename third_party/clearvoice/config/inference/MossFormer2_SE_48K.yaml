@@ -4,8 +4,7 @@ use_cuda: 1 # 1 for True, 0 for False
 num_gpu: 1
 sampling_rate: 48000
 network: "MossFormer2_SE_48K"  ##network type
-# checkpoint_dir: "checkpoints/MossFormer2_SE_48K"
-checkpoint_dir: "models/se_models/MossFormer2_SE_48K"
+checkpoint_dir: "/Users/boom/Model/SE/MossFormer2_SE_48K"
 
 #input_path: support wav dir or wav scp or a wav file
 input_path: "assets/clearvoice_samples/scp/audio_samples.scp"
