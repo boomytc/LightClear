@@ -65,10 +65,13 @@ uv pip install -e .
 ```bash
 cd explore/light_clearvoice
 .venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice.__name__)"
-.venv/bin/python -m py_compile demo/*.py
+.venv/bin/python -m tests.test_clearvoice_import
 
 cd ../../products/speech_enhance_web
 .venv/bin/python -m tests.test_health
+
+cd ../..
+python3 scripts/check_layout.py
 ```
 
 完整推理前确认中心模型目录存在。缺权重是环境限制。

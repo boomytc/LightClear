@@ -42,6 +42,7 @@
 
 - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice.__name__)"`
 - `.venv/bin/python -m py_compile demo/*.py`
+- `.venv/bin/python -m tests.test_clearvoice_import`
 - 完整推理前确认对应中心模型目录存在。缺权重是环境限制，不是模块缺陷。
 
 ## Cleanup
