@@ -4,11 +4,15 @@ __pycache__
 
 # 编译相关
 .venv/
+**/.venv/
 *.egg-info/
 uv.lock
 
 # 运行产物
 outputs/
+**/outputs/
+**/output/
+logs/
 
 # 压缩文件
 *.zip

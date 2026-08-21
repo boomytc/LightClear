@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "light-clearvoice"
 version = "0.5.0"
-description = "LightASR ClearVoice speech enhancement, separation, and super-resolution module"
+description = "ClearVoice exploration family for speech enhancement, separation, super-resolution, and target speaker extraction"
 requires-python = ">=3.10"
 dependencies = [
   "einops",
@@ -42,14 +42,6 @@ dependencies = [
   "tensorboard==2.14.0",
   "typeguard==4.3.0",
   "xls_r_sqa",
-]
-
-[project.optional-dependencies]
-web = [
-  "fastapi>=0.115",
-  "matplotlib>=3.8",
-  "python-multipart>=0.0.9",
-  "uvicorn[standard]>=0.30",
 ]
 
 [tool.setuptools]

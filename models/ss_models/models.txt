@@ -1,5 +1,0 @@
-# SS Models
-
-- MossFormer2_SS_16K
-  下载页: https://www.modelscope.cn/models/alibabasglab/MossFormer2_SS_16K
-  中心目录: /Users/boom/Model/SS/MossFormer2_SS_16K

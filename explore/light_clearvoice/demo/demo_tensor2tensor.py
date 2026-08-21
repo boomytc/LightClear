@@ -6,8 +6,8 @@ import numpy as np
 import soundfile as sf
 import torch
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-THIRD_PARTY_DIR = PROJECT_ROOT / "third_party"
+MODULE_ROOT = Path(__file__).resolve().parents[1]
+THIRD_PARTY_DIR = MODULE_ROOT / "third_party"
 if str(THIRD_PARTY_DIR) not in sys.path:
     sys.path.insert(0, str(THIRD_PARTY_DIR))
 
@@ -16,9 +16,9 @@ from clearvoice import ClearVoice
 TASK_NAME = "speech_enhancement"
 MODEL_NAME = "FRCRN_SE_16K"
 SAMPLE_RATE = 16000
-INPUT_AUDIO = "assets/clearvoice_samples/input.wav"
-OUTPUT_NUMPY_AUDIO = "outputs/tensor2tensor/FRCRN_SE_16K_numpy.wav"
-OUTPUT_TORCH_AUDIO = "outputs/tensor2tensor/FRCRN_SE_16K_torch.wav"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/input.wav"
+OUTPUT_NUMPY_AUDIO = str(MODULE_ROOT / "outputs" / "tensor2tensor" / "FRCRN_SE_16K_numpy.wav")
+OUTPUT_TORCH_AUDIO = str(MODULE_ROOT / "outputs" / "tensor2tensor" / "FRCRN_SE_16K_torch.wav")
 
 myClearVoice = ClearVoice(task=TASK_NAME, model_names=[MODEL_NAME])
 
