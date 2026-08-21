@@ -11,8 +11,9 @@ import time
 AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "MossFormer2_SE_48K"
 TASK_NAME = "speech_enhancement"
-DEFAULT_OUTPUT_DIR = "outputs/speech_enhance_web/enhanced"
+DEFAULT_OUTPUT_DIR = "workspace/outputs"
 MODEL_ROOT = Path("/Users/boom/Model/SE")
+SAMPLE_AUDIO_FILES = ("assets/input.wav",)
 
 
 @dataclass
@@ -31,16 +32,14 @@ class EnhancementResult:
     total_seconds: float
 
 
-def bootstrap_project_paths(project_root: Path) -> None:
-    third_party_dir = project_root / "third_party"
-    for path in (project_root, third_party_dir):
-        path_str = str(path)
-        if path_str not in sys.path:
-            sys.path.insert(0, path_str)
+def bootstrap_product_paths(product_root: Path) -> None:
+    third_party_dir = str(product_root / "third_party")
+    if third_party_dir not in sys.path:
+        sys.path.insert(0, third_party_dir)
 
 
-def load_mossformer2_se(project_root: Path) -> ModelHandle:
-    bootstrap_project_paths(project_root)
+def load_mossformer2_se(product_root: Path) -> ModelHandle:
+    bootstrap_product_paths(product_root)
     from clearvoice import ClearVoice
 
     start_time = time.perf_counter()
@@ -51,35 +50,36 @@ def load_mossformer2_se(project_root: Path) -> ModelHandle:
     )
 
 
-def model_checkpoint_dir(project_root: Path) -> Path:
+def model_checkpoint_dir(product_root: Path) -> Path:
     return MODEL_ROOT / MODEL_NAME
 
 
-def model_is_available(project_root: Path) -> bool:
-    checkpoint_dir = model_checkpoint_dir(project_root)
+def model_is_available(product_root: Path) -> bool:
+    checkpoint_dir = model_checkpoint_dir(product_root)
     return (
         checkpoint_dir.is_dir()
         and (checkpoint_dir / "last_best_checkpoint").is_file()
     )
 
 
-def list_sample_audio(project_root: Path) -> list[Path]:
-    sample_dir = project_root / "assets" / "clearvoice_samples"
+def list_sample_audio(product_root: Path) -> list[Path]:
     files: list[Path] = []
-    for extension in AUDIO_EXTENSIONS:
-        files.extend(sample_dir.glob(f"*.{extension}"))
-    return sorted(files)
+    for sample_file in SAMPLE_AUDIO_FILES:
+        path = product_root / sample_file
+        if path.is_file() and path.suffix.lower().lstrip(".") in AUDIO_EXTENSIONS:
+            files.append(path)
+    return files
 
 
-def resolve_project_output_dir(project_root: Path, raw_value: str) -> Path:
+def resolve_project_output_dir(product_root: Path, raw_value: str) -> Path:
     value = raw_value.strip() or DEFAULT_OUTPUT_DIR
     output_dir = Path(value).expanduser()
     if not output_dir.is_absolute():
-        output_dir = project_root / output_dir
+        output_dir = product_root / output_dir
 
     output_dir = output_dir.resolve()
     try:
-        output_dir.relative_to(project_root.resolve())
+        output_dir.relative_to(product_root.resolve())
     except ValueError as exc:
         raise ValueError("输出目录必须位于当前项目目录内。") from exc
 

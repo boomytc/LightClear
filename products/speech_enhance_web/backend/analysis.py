@@ -15,7 +15,6 @@ import numpy as np
 from scipy import signal
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
 FONT_PATH = Path(__file__).resolve().parent / "assets" / "fonts" / "SimHei.ttf"
 
 if FONT_PATH.exists():
