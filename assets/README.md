@@ -9,6 +9,7 @@ assets/
   audio/noisy/          # 带噪语音，供语音增强
   audio/mixture/        # 混合语音，供说话人分离
   audio/bandlimited/    # 带限语音，供超分辨率
+  audio/music/          # 带伴奏混合，供人声隔离 / 分轨
   video/speech/         # 含人脸与语音的视频，供目标说话人提取
   manifests/            # 批处理 .scp 清单，路径为绝对路径
 ```
@@ -16,7 +17,8 @@ assets/
 ## 分类规则
 
 - 第一级按介质：`audio/` / `video/`。
-- 第二级按用途：`noisy`、`mixture`、`bandlimited`、`speech`。
+- 第二级按用途：`noisy`、`mixture`、`bandlimited`、`music`、`speech`。
+- `mixture` 是双说话人；`music` 是人声加伴奏。不要混放。
 - 同内容只保留一份。产品需要样例时拷进产品自己的 `assets/`，不要运行时读取本目录。
 
 ## 使用规则
@@ -33,3 +35,4 @@ assets/
 | `manifests/ss.scp` | 语音分离批处理 |
 | `manifests/sr.scp` | 语音超分辨率批处理 |
 | `manifests/tse.scp` | 目标说话人提取批处理 |
+| `audio/music/test.mp3` | Demucs 人声隔离 / 分轨样例 |

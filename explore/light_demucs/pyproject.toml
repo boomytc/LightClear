@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "light-demucs"
+version = "0.1.0"
+description = "Demucs exploration family for vocal isolation and music stem separation"
+requires-python = ">=3.10"
+dependencies = [
+  "einops",
+  "huggingface-hub",
+  "julius>=0.2.3",
+  "lameenc>=1.2",
+  "numpy",
+  "pyyaml",
+  "safetensors",
+  "sphn>=0.1.12",
+  "torch>=2.1",
+  "tqdm",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["third_party"]
+include = ["demucs*"]
+
+[tool.setuptools.package-data]
+"demucs" = ["py.typed", "remote/*"]
