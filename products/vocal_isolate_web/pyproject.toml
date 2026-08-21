@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vocal-isolate-web"
+version = "1.0.0"
+description = "Standalone LightClear vocal isolation FastAPI WebUI"
+requires-python = ">=3.10"
+dependencies = [
+  "einops",
+  "fastapi>=0.115",
+  "huggingface-hub",
+  "httpx",
+  "julius>=0.2.3",
+  "lameenc>=1.2",
+  "librosa",
+  "matplotlib>=3.8",
+  "numpy",
+  "python-multipart>=0.0.9",
+  "pyyaml",
+  "safetensors",
+  "scipy>=1.10.1",
+  "sphn>=0.1.12",
+  "torch>=2.1",
+  "tqdm",
+  "uvicorn[standard]>=0.30",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = [".", "third_party"]
+include = ["backend*", "demucs*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"demucs" = ["py.typed", "remote/*"]
