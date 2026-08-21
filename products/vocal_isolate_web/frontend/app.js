@@ -28,8 +28,8 @@ function bindElements() {
     "outputDir",
     "waveformSeconds",
     "waveformSecondsText",
-    "enhanceButton",
-    "enhanceButtonText",
+    "isolateButton",
+    "isolateButtonText",
     "busySpinner",
     "resetButton",
     "statusMessage",
@@ -39,7 +39,7 @@ function bindElements() {
     "outputName",
     "outputPath",
     "originalAudio",
-    "enhancedAudio",
+    "vocalsAudio",
     "downloadLink",
     "outputList",
     "initialLoadMetric",
@@ -104,15 +104,15 @@ function sampleAudioUrl(path) {
   return `/api/sample-audio?path=${encodeURIComponent(path)}`;
 }
 
-function updateEnhanceButton() {
+function updateIsolateButton() {
   const hasSample = state.source === "sample" && Boolean(selectedSample());
   const hasUpload = state.source === "upload" && el.uploadFile.files.length > 0;
-  el.enhanceButton.disabled = state.busy || !(hasSample || hasUpload);
+  el.isolateButton.disabled = state.busy || !(hasSample || hasUpload);
 }
 
 function setBusy(isBusy) {
   state.busy = isBusy;
-  el.enhanceButtonText.textContent = isBusy ? "处理中" : "开始隔离";
+  el.isolateButtonText.textContent = isBusy ? "处理中" : "开始隔离";
   el.busySpinner.classList.toggle("hidden", !isBusy);
   el.sampleSelect.disabled = isBusy;
   el.uploadFile.disabled = isBusy;
@@ -121,7 +121,7 @@ function setBusy(isBusy) {
   el.sampleSourceButton.disabled = isBusy;
   el.uploadSourceButton.disabled = isBusy;
   el.resetButton.disabled = isBusy;
-  updateEnhanceButton();
+  updateIsolateButton();
 }
 
 function setSource(source) {
@@ -135,7 +135,7 @@ function setSource(source) {
   el.uploadControls.classList.toggle("hidden", sampleActive);
   resetResult(false);
   updateInputPreview();
-  updateEnhanceButton();
+  updateIsolateButton();
 }
 
 function updateInputPreview() {
@@ -180,7 +180,7 @@ function clearAnalysisPanels() {
 }
 
 function resetResult(writeLog = true) {
-  el.enhancedAudio.removeAttribute("src");
+  el.vocalsAudio.removeAttribute("src");
   el.outputName.textContent = "无结果";
   el.outputName.classList.add("muted");
   el.outputPath.textContent = "-";
@@ -241,7 +241,7 @@ function renderMetrics(rows) {
 function renderResult(data) {
   const outputs = data.outputs || [];
   const vocals = outputs.find((item) => item.id === "vocals") || outputs[0] || null;
-  el.enhancedAudio.src = vocals?.audio_url || data.output_audio_url;
+  el.vocalsAudio.src = vocals?.audio_url || data.output_audio_url;
   el.outputName.textContent = data.output_name;
   el.outputName.classList.remove("muted");
   el.outputPath.textContent = outputs.map((item) => item.path).join("\n") || data.output_path;
@@ -314,7 +314,7 @@ async function loadHealth() {
     setBadge("status-idle", "首次将下载");
     setStatus("本地尚未缓存权重，第一次隔离会从 Hugging Face 下载。");
   }
-  updateEnhanceButton();
+  updateIsolateButton();
 }
 
 async function loadSamples() {
@@ -337,7 +337,7 @@ async function loadSamples() {
     el.sampleSelect.disabled = true;
   }
   updateInputPreview();
-  updateEnhanceButton();
+  updateIsolateButton();
 }
 
 async function runIsolation() {
@@ -392,17 +392,17 @@ function bindEvents() {
   el.sampleSelect.addEventListener("change", () => {
     resetResult(false);
     updateInputPreview();
-    updateEnhanceButton();
+    updateIsolateButton();
   });
   el.uploadFile.addEventListener("change", () => {
     resetResult(false);
     updateInputPreview();
-    updateEnhanceButton();
+    updateIsolateButton();
   });
   el.waveformSeconds.addEventListener("input", () => {
     el.waveformSecondsText.textContent = `${el.waveformSeconds.value} 秒`;
   });
-  el.enhanceButton.addEventListener("click", runIsolation);
+  el.isolateButton.addEventListener("click", runIsolation);
   el.resetButton.addEventListener("click", () => {
     resetResult(true);
     updateInputPreview();

@@ -47,7 +47,7 @@ def bootstrap_product_paths(product_root: Path) -> None:
 
 
 def local_model_repo() -> Path | None:
-    if MSS_ROOT.is_dir():
+    if MSS_ROOT.is_dir() and any(MSS_ROOT.iterdir()):
         return MSS_ROOT
     return None
 

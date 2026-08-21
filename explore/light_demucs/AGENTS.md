@@ -17,7 +17,7 @@
 ## Layout
 
 - Python 包源码位于 `third_party/demucs`，公共入口是 `from demucs.api import Separator`。
-- `third_party/demucs` 是 `/Users/boom/workspace/demucs/demucs` 的 vendor 副本（上游 `adefossez/demucs` v4.1.0，`eeac1d15891af95b1288d2884b95baa3e5baa96c`）。允许在这份副本上做本模块需要的上游修改。官方仓库更新后单独判断是否值得同步，不要自动覆盖本地改动。
+- `third_party/demucs` 是 `/Users/boom/workspace/demucs/demucs` 的 vendor 副本（上游 `adefossez/demucs` v4.1.0，`eeac1d15891af95b1288d2884b95baa3e5baa96c`）。允许在这份副本上做本模块需要的上游修改。官方仓库更新后单独判断是否值得同步，不要自动覆盖本地改动。产品 `vocal_isolate_web` 从本模块 `third_party/demucs` 再拷一份，不要从 `workspace/demucs` 直拷。
 - 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`。本模块不保留本地 `models/` 权重目录。
 - 可选中心模型目录：`/Users/boom/Model/MSS/`。未指定本地仓时，`Separator(repo=None)` 从 Hugging Face `adefossez/*` 加载。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。

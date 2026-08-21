@@ -20,7 +20,7 @@
 - `third_party/demucs`：产品本地 vendored 运行时，来自 `explore/light_demucs/third_party/demucs`。
 - `assets/next_station_heaven.mp3`：产品自有带唱短样例。
 - `workspace/uploads/`、`workspace/outputs/`：运行产物。
-- 权重默认 Hugging Face `adefossez/HTDemucs`；可选 `/Users/boom/Model/MSS/`。
+- 权重默认 Hugging Face `adefossez/HTDemucs`。仅当 `/Users/boom/Model/MSS/` 存在且非空时用本地仓；空目录或缺失都走 Hub，不读 explore。
 
 ## Validation
 

@@ -113,9 +113,9 @@ def build_metrics_rows(
 
     snr_improvement = metrics["snr_improvement"]
     snr_desc = (
-        "信噪比显著改善，噪声抑制效果优秀"
+        "人声与原曲差异大，隔离明显"
         if snr_improvement > 5
-        else "信噪比适度改善，噪声得到良好控制"
+        else "人声与原曲有差异，隔离可见"
         if snr_improvement > 0
         else "信噪比略有下降，可能过度处理"
         if snr_improvement < -2

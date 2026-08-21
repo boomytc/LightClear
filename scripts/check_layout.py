@@ -80,6 +80,8 @@ def main() -> None:
             fail(f"{relative} still uses parents[3] (old repo-root launch)")
         if repo_third_party in text:
             fail(f"{relative} references repo-root third_party")
+        if relative.startswith("products/vocal_isolate_web/") and "speaker-" in text:
+            fail(f"{relative} still uses speaker-* contract")
 
     for path in iter_tracked_files((".md",)):
         text = path.read_text(encoding="utf-8")
