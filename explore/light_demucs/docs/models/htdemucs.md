@@ -37,4 +37,5 @@ origin, stems = separator.separate_audio_file("track.mp3")
 
 - 本机 CPU 完整推理时长随曲长变化，未作为门禁。
 - MPS / CUDA 速度与数值未在本模块文档中核验。
-- 仓库样例 `assets/audio/music/test.mp3` 是上游烟雾片段，人声轨能量很低，不代表真实歌曲效果。
+- 仓库样例 `assets/audio/music/test.mp3` 是上游烟雾片段，人声轨能量很低。
+- 默认 demo 使用 `assets/audio/music/next_station_heaven.mp3`（带唱 30 秒，仅供本机演示）。

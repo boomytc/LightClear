@@ -35,4 +35,5 @@ assets/
 | `manifests/ss.scp` | 说话人分离批处理 |
 | `manifests/sr.scp` | 语音超分辨率批处理 |
 | `manifests/tse.scp` | 目标说话人提取批处理 |
-| `audio/music/test.mp3` | Demucs 人声隔离 / 分轨样例 |
+| `audio/music/test.mp3` | 上游 Demucs 烟雾片段，人声能量很低 |
+| `audio/music/next_station_heaven.mp3` | 带唱短片段（蔡卓妍《下一站天后》DJ 混音约 0:50 起 30 秒），仅供本机演示 |

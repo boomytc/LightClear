@@ -26,7 +26,7 @@ uv pip install -e .
 .venv/bin/python demo/demo_stems.py
 ```
 
-样例来自仓库根 `assets/audio/music/`。`test.mp3` 是上游烟雾测试片段，人声能量很低；听人声隔离请把 `INPUT_AUDIO` 换成真实歌曲。输出写入本模块 `outputs/`。
+样例来自仓库根 `assets/audio/music/`。默认 demo 用 `next_station_heaven.mp3`（带唱短片段，仅供本机演示）。`test.mp3` 是上游烟雾片，人声能量很低。输出写入本模块 `outputs/`。
 
 ## 模型
 

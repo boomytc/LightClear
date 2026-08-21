@@ -14,7 +14,7 @@ SHIFTS = 1
 OVERLAP = 0.25
 SEGMENT = 7
 MODEL_REPO = None  # Hugging Face；本地仓改为 Path("/Users/boom/Model/MSS")
-INPUT_AUDIO = Path("/Users/boom/workspace/LightClear/assets/audio/music/test.mp3")
+INPUT_AUDIO = Path("/Users/boom/workspace/LightClear/assets/audio/music/next_station_heaven.mp3")
 OUTPUT_DIR = MODULE_ROOT / "outputs" / MODEL_NAME / INPUT_AUDIO.stem
 
 separator = Separator(
