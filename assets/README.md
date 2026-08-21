@@ -22,7 +22,7 @@ assets/
 ## 使用规则
 
 - Demo / CLI 顶部显式写出绝对路径，例如 `/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav`。
-- 批量输入使用 `manifests/*.scp` 中列出的路径，或把明确的目录路径交给 ClearVoice 的目录输入 API。
+- 批量输入优先用 `manifests/*.scp` 列出的路径。把用途目录交给 ClearVoice 目录输入 API 时，目录内文件可能比对应 scp 更多（例如 `audio/noisy/` 含 `test.wav`，`video/speech/` 含 `003.avi`）。
 - 不要把本目录当作产品默认样例池去 `glob`。
 
 ## 清单

@@ -35,6 +35,8 @@ LightClear/
 
 ## 探索模块
 
+从仓库根目录：
+
 ```bash
 cd explore/light_clearvoice
 uv venv --python 3.12
@@ -49,7 +51,7 @@ uv pip install -e .
 
 ## 产品
 
-每个产品在自己的目录安装和启动：
+从仓库根目录进入产品目录后安装和启动：
 
 ```bash
 cd products/speech_enhance_web

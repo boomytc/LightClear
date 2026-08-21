@@ -10,8 +10,9 @@ from clearvoice import ClearVoice
 
 ## 安装
 
+在本模块目录内执行：
+
 ```bash
-cd explore/light_clearvoice
 uv venv --python 3.12
 uv pip install -e .
 ```

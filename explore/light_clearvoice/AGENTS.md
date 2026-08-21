@@ -22,7 +22,7 @@
   - SE / TSE：`/Users/boom/Model/SE/<ModelName>`
   - SS：`/Users/boom/Model/SS/<ModelName>`
   - SR：`/Users/boom/Model/SR/<ModelName>`
-- 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 必须与中心目录约定一致。
+- 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 必须与中心目录约定一致。yaml 里的 `input_path` / `output_dir` 只是配置占位，真正输入输出由 `ClearVoice(...)` 调用参数决定。
 - 共享样例使用仓库根 `assets/` 的绝对路径。不要在本模块再拷一份共享 wav。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
 - 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。

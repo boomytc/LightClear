@@ -67,6 +67,14 @@ def main() -> None:
         if 'uv pip install -e ".[web]"' in text or "uv pip install -e '.[web]'" in text:
             fail(f"{path.relative_to(REPO_ROOT)} still documents root extra web install")
 
+    for relative in tracked:
+        if relative == "scripts/check_layout.py":
+            continue
+        if relative.endswith((".py", ".md", ".yaml", ".yml", ".html", ".js", ".toml")):
+            text = (REPO_ROOT / relative).read_text(encoding="utf-8")
+            if "clearvoice_samples" in text:
+                fail(f"{relative} still mentions retired sample tree")
+
     print("layout_ok")
     print(f"tracked_files={len(tracked)}")
     print(f"repo_root={REPO_ROOT}")

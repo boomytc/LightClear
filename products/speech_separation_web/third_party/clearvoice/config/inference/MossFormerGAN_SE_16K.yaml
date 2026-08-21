@@ -6,7 +6,8 @@ sampling_rate: 16000
 network: "MossFormerGAN_SE_16K"  ##network type
 checkpoint_dir: "/Users/boom/Model/SE/MossFormerGAN_SE_16K"
 
-input_path: "assets/clearvoice_samples/scp/audio_samples.scp"
+# ClearVoice() 调用时会覆盖 input_path；此处不再指向样例池。
+input_path: ""
 output_dir: "outputs/MossFormerGAN_SE_16K" ## output dir to store processed audio
 
 # decode parameters

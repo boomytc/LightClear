@@ -7,7 +7,8 @@ network: "MossFormer2_SE_48K"  ##network type
 checkpoint_dir: "/Users/boom/Model/SE/MossFormer2_SE_48K"
 
 #input_path: support wav dir or wav scp or a wav file
-input_path: "assets/clearvoice_samples/scp/audio_samples.scp"
+# ClearVoice() 调用时会覆盖 input_path；此处不再指向样例池。
+input_path: ""
 output_dir: "outputs/MossFormer2_SE_48K"
 
 # decode parameters

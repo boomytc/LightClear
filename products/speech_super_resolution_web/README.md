@@ -4,8 +4,9 @@
 
 ## 运行
 
+在本产品目录内执行：
+
 ```bash
-cd products/speech_super_resolution_web
 uv venv --python 3.12
 uv pip install -e .
 .venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 7860

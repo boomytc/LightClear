@@ -21,6 +21,8 @@
 
 ## 从哪进
 
+从仓库根目录：
+
 ```bash
 cd explore/light_clearvoice
 uv venv --python 3.12
