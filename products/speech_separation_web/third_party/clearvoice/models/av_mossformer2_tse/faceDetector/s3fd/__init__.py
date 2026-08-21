@@ -1,8 +1,7 @@
-import time, os, sys, subprocess
+import time
 import numpy as np
 import cv2
 import torch
-from torchvision import transforms
 from pathlib import Path
 
 from .nets import S3FDNet
@@ -18,17 +17,13 @@ class S3FD():
         tstamp = time.time()
         self.device = device
 
-        PATH_WEIGHT = Path(__file__).parent / "sfd_face.pth"
-        if os.path.isfile(PATH_WEIGHT) == False:
-            Link = "1KafnHz7ccT-3IyddBsL5yi2xGtxAKypt"
-            cmd = "gdown --id %s -O %s"%(Link, PATH_WEIGHT)
-            subprocess.call(cmd, shell=True, stdout=None)
-        
+        PATH_WEIGHT = Path(__file__).resolve().parent / "sfd_face.pth"
+        if not PATH_WEIGHT.is_file():
+            raise FileNotFoundError(f"TSE 人脸检测权重缺失: {PATH_WEIGHT}")
 
         # print('[S3FD] loading with', self.device)
         self.net = S3FDNet(device=self.device).to(self.device)
-        PATH = os.path.join(os.getcwd(), PATH_WEIGHT)
-        state_dict = torch.load(PATH, map_location=self.device)
+        state_dict = torch.load(str(PATH_WEIGHT), map_location=self.device)
         self.net.load_state_dict(state_dict)
         self.net.eval()
         # print('[S3FD] finished loading (%.4f sec)' % (time.time() - tstamp))

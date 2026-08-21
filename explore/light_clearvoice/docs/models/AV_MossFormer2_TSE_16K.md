@@ -33,8 +33,13 @@ cv = ClearVoice(task="target_speaker_extraction", model_names=["AV_MossFormer2_T
 
 ## 人脸检测权重
 
-`third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth` 不进 git。TSE 推理前该文件必须出现在上述路径。
+TSE 推理会构造 S3FD，权重文件固定为：
+
+`third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth`
+
+这不是 `AV_MossFormer2_TSE_16K` 的网络 checkpoint，也不进 git。缺文件直接 `FileNotFoundError`，不要用 `gdown` 或家庭缓存补。SE / SS / SR 产品不跑 TSE，不需要这份文件。
 
 ## 未验证/待确认
 
+- 本机中心目录若尚未安装 `AV_MossFormer2_TSE_16K`，`demo/demo_tse.py` 完整推理仍缺网络权重。
 - 官方支持的视频编码、人脸缺失时的行为未在本模块单独核验。

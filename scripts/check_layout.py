@@ -93,6 +93,8 @@ def main() -> None:
             and "install_htdemucs.py" in text
         ):
             fail(f"{relative} still documents install_htdemucs.py")
+        if relative.endswith("faceDetector/s3fd/__init__.py") and "gdown" in text:
+            fail(f"{relative} still downloads sfd_face.pth with gdown")
 
     for path in iter_tracked_files((".md",)):
         text = path.read_text(encoding="utf-8")

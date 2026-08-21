@@ -47,11 +47,35 @@ def compile_demos() -> list[str]:
     return names
 
 
+def check_sfd_face_loader() -> str:
+    path = (
+        MODULE_ROOT
+        / "third_party"
+        / "clearvoice"
+        / "models"
+        / "av_mossformer2_tse"
+        / "faceDetector"
+        / "s3fd"
+        / "__init__.py"
+    )
+    if not path.is_file():
+        raise AssertionError(f"missing {path}")
+    text = path.read_text(encoding="utf-8")
+    if "gdown" in text or "1KafnHz7ccT-3IyddBsL5yi2xGtxAKypt" in text:
+        raise AssertionError("s3fd loader must not download sfd_face.pth")
+    if "FileNotFoundError" not in text:
+        raise AssertionError("s3fd loader must fail locally when sfd_face.pth is missing")
+    weight = path.with_name("sfd_face.pth")
+    return "present" if weight.is_file() else "missing"
+
+
 def main() -> None:
     name = load_clearvoice_name()
     demos = compile_demos()
+    sfd_face = check_sfd_face_loader()
     print(f"import_name={name}")
     print("demos=" + ",".join(demos))
+    print(f"sfd_face={sfd_face}")
 
 
 if __name__ == "__main__":

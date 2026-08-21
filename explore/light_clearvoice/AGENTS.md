@@ -26,7 +26,7 @@
 - 共享样例使用仓库根 `assets/` 的绝对路径。不要在本模块再拷一份共享 wav。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
 - 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。
-- TSE 人脸检测权重 `third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth` 不纳入版本控制。推理前需该文件出现在上述路径（可从中心模型目录拷入）。缺文件时 `ClearVoice` 仍可导入，TSE 推理会失败。
+- TSE 人脸检测权重 `third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth` 不纳入版本控制。上游 S3FD 从该文件旁的 `__file__` 加载，不在 `checkpoint_dir` 里。缺文件时 `ClearVoice` 仍可导入，构造人脸检测器会直接失败，不要 `gdown`。SE / SS / SR 产品不跑 TSE，不必拷这份权重。TSE 网络权重仍走 `/Users/boom/Model/SE/AV_MossFormer2_TSE_16K`。
 
 ## Runtime Rules
 

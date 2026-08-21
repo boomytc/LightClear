@@ -6,7 +6,7 @@ ClearVoice 探索模块。公共入口：
 from clearvoice import ClearVoice
 ```
 
-覆盖语音增强、说话人分离、语音超分辨率和音视频目标说话人提取。模型权重使用中心目录 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 分轨在兄弟模块 `light_demucs`。
+覆盖语音增强、说话人分离、语音超分辨率和音视频目标说话人提取。模型权重使用中心目录 `/Users/boom/Model/{SE,SS,SR}/`。TSE 人脸检测权重 `sfd_face.pth` 放在 vendored S3FD 目录，不走中心 checkpoint。Demucs 分轨在兄弟模块 `light_demucs`。
 
 ## 安装
 
