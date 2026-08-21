@@ -12,8 +12,14 @@ https://huggingface.co/adefossez/HTDemucs
 
 ## 本地路径
 
-- Hugging Face 缓存（`Separator(repo=None)` 默认）
-- 可选中心目录：`/Users/boom/Model/MSS/`
+`/Users/boom/Model/MSS/htdemucs`
+
+内含 `htdemucs.yaml` 与签名 `.th`。安装：
+
+```bash
+cd explore/light_demucs
+.venv/bin/python scripts/install_htdemucs.py
+```
 
 ## 运行框架
 
@@ -28,8 +34,9 @@ PyTorch。包源码在 `third_party/demucs`。
 ## 加载方式
 
 ```python
+from pathlib import Path
 from demucs.api import Separator
-separator = Separator(model="htdemucs", device="cpu", segment=7)
+separator = Separator(model="htdemucs", repo=Path("/Users/boom/Model/MSS/htdemucs"), device="cpu", segment=7)
 origin, stems = separator.separate_audio_file("track.mp3")
 ```
 
