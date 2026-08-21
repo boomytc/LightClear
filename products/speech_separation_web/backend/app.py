@@ -29,10 +29,9 @@ from .runtime import (
 )
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-APP_DIR = Path(__file__).resolve().parents[1]
-FRONTEND_DIR = APP_DIR / "frontend"
-APP_OUTPUT_ROOT = PROJECT_ROOT / "outputs" / "speech_separation_web"
+PRODUCT_ROOT = Path(__file__).resolve().parents[1]
+FRONTEND_DIR = PRODUCT_ROOT / "frontend"
+APP_OUTPUT_ROOT = PRODUCT_ROOT / "workspace"
 UPLOAD_DIR = APP_OUTPUT_ROOT / "uploads"
 MAX_UPLOAD_BYTES = 200 * 1024 * 1024
 
@@ -60,7 +59,7 @@ _jobs_lock = threading.Lock()
 def project_relative(path: Path) -> str:
     resolved_path = path.resolve()
     try:
-        return str(resolved_path.relative_to(PROJECT_ROOT.resolve()))
+        return str(resolved_path.relative_to(PRODUCT_ROOT.resolve()))
     except ValueError:
         return str(resolved_path)
 
@@ -69,7 +68,7 @@ def get_model_handle() -> ModelHandle:
     global _model_handle
     with _model_lock:
         if _model_handle is None:
-            _model_handle = load_mossformer2_ss(PROJECT_ROOT)
+            _model_handle = load_mossformer2_ss(PRODUCT_ROOT)
         return _model_handle
 
 
@@ -77,8 +76,8 @@ def resolve_sample_path(sample_path: str | None) -> Path:
     if not sample_path:
         raise HTTPException(status_code=400, detail="请选择示例音频。")
 
-    candidate = (PROJECT_ROOT / sample_path).resolve()
-    sample_dir = (PROJECT_ROOT / "assets" / "clearvoice_samples").resolve()
+    candidate = (PRODUCT_ROOT / sample_path).resolve()
+    sample_dir = (PRODUCT_ROOT / "assets").resolve()
     try:
         candidate.relative_to(sample_dir)
     except ValueError as exc:
@@ -183,13 +182,13 @@ def favicon() -> Response:
 
 @app.get("/api/health")
 def health() -> dict[str, object]:
-    checkpoint_dir = model_checkpoint_dir(PROJECT_ROOT)
-    samples = list_sample_audio(PROJECT_ROOT)
+    checkpoint_dir = model_checkpoint_dir(PRODUCT_ROOT)
+    samples = list_sample_audio(PRODUCT_ROOT)
     return {
         "app": "speech_separation_web",
         "model_name": "MossFormer2_SS_16K",
         "task": "speech_separation",
-        "model_available": model_is_available(PROJECT_ROOT),
+        "model_available": model_is_available(PRODUCT_ROOT),
         "checkpoint_dir": project_relative(checkpoint_dir),
         "sample_count": len(samples),
         "default_output_dir": DEFAULT_OUTPUT_DIR,
@@ -206,7 +205,7 @@ def samples() -> dict[str, object]:
             "path": project_relative(path),
             "audio_url": f"/api/sample-audio?path={project_relative(path)}",
         }
-        for path in list_sample_audio(PROJECT_ROOT)
+        for path in list_sample_audio(PRODUCT_ROOT)
     ]
     return {"samples": items}
 
@@ -246,7 +245,7 @@ async def separate(
         raise HTTPException(status_code=400, detail="音频来源无效。")
 
     try:
-        resolved_output_dir = resolve_project_output_dir(PROJECT_ROOT, output_dir)
+        resolved_output_dir = resolve_project_output_dir(PRODUCT_ROOT, output_dir)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
