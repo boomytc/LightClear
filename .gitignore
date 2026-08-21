@@ -14,7 +14,12 @@ outputs/
 **/output/
 logs/
 
-# 压缩文件
-*.zip
+# 模型权重与编辑器缓存（不进版本库）
+*.pth
+*.pt
+*.ckpt
 *.pkf
 *.bk
+
+# 压缩文件
+*.zip
