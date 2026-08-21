@@ -22,6 +22,8 @@ STALE_DOC_PHRASES = (
     "第二个上游",
     "Demucs 尚未产品化",
     "/Users/boom/Model/MSS",
+    "scripts/install_htdemucs.py",
+    "/Users/boom/workspace/demucs",
 )
 
 
@@ -45,6 +47,8 @@ def iter_tracked_files(suffixes: tuple[str, ...]) -> list[Path]:
     files: list[Path] = []
     for relative in git_ls_files():
         path = REPO_ROOT / relative
+        if not path.is_file():
+            continue
         if any(part in SKIP_PARTS for part in path.parts):
             continue
         if path.suffix.lower() in suffixes:
@@ -83,6 +87,12 @@ def main() -> None:
             fail(f"{relative} references repo-root third_party")
         if relative.startswith("products/vocal_isolate_web/") and "speaker-" in text:
             fail(f"{relative} still uses speaker-* contract")
+        if (
+            relative.startswith("explore/light_demucs/")
+            and not relative.startswith("explore/light_demucs/tests/")
+            and "install_htdemucs.py" in text
+        ):
+            fail(f"{relative} still documents install_htdemucs.py")
 
     for path in iter_tracked_files((".md",)):
         text = path.read_text(encoding="utf-8")
@@ -94,8 +104,11 @@ def main() -> None:
     for relative in tracked:
         if relative == "scripts/check_layout.py":
             continue
+        path = REPO_ROOT / relative
+        if not path.is_file():
+            continue
         if relative.endswith((".py", ".md", ".yaml", ".yml", ".html", ".js", ".toml")):
-            text = (REPO_ROOT / relative).read_text(encoding="utf-8")
+            text = path.read_text(encoding="utf-8")
             if "clearvoice_samples" in text:
                 fail(f"{relative} still mentions retired sample tree")
             if relative.endswith(".md"):

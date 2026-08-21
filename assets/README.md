@@ -9,7 +9,7 @@ assets/
   audio/noisy/          # 带噪语音，供语音增强
   audio/mixture/        # 混合语音，供说话人分离
   audio/bandlimited/    # 带限语音，供超分辨率
-  audio/music/          # 带伴奏混合，供人声隔离 / 分轨
+  audio/music/          # 带伴奏混合，供人声隔离 / 四轨 / 六轨
   video/speech/         # 含人脸与语音的视频，供目标说话人提取
   manifests/            # 批处理 .scp 清单，路径为绝对路径
 ```

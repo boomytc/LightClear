@@ -7,7 +7,7 @@ LightClear 是音频变清晰工作区。把带噪、混合、带限或叠乐的
 | 家族 | 公共入口 | 做什么 |
 | --- | --- | --- |
 | `explore/light_clearvoice` | `from clearvoice import ClearVoice` | 语音增强、说话人分离、超分、目标说话人提取 |
-| `explore/light_demucs` | `from demucs.api import Separator` | 人声隔离、音乐分轨 |
+| `explore/light_demucs` | `from demucs.api import Separator` | 人声隔离、四轨 / 六轨分轨 |
 
 ## 目录
 
@@ -53,7 +53,7 @@ uv pip install -e .
 .venv/bin/python demo/demo_vocals.py
 ```
 
-ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重放在各自模块/产品的 `models/htdemucs/`。详见各模块 README。
+ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重放在各自模块/产品的 `models/<model>/`；产品 `vocal_isolate_web` 目前只装 `htdemucs`。详见各模块 README。
 
 ## 产品
 

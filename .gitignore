@@ -24,6 +24,8 @@ logs/
 *.bk
 **/.download/
 **/models/htdemucs/
+**/models/htdemucs_ft/
+**/models/htdemucs_6s/
 
 # 压缩文件
 *.zip

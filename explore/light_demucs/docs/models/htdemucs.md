@@ -2,7 +2,9 @@
 
 ## 模型简介
 
-Hybrid Transformer Demucs v4 默认模型。把混合音频分成 vocals、drums、bass、other 四轨。人声隔离取 `vocals`，伴奏由其余三轨相加得到。
+Hybrid Transformer Demucs v4 默认单模型。把混合音频分成 vocals、drums、bass、other 四轨。人声隔离取 `vocals`，伴奏由其余三轨相加得到。`vocal_isolate_web` 抄的就是这一档。
+
+同任务质量档见 `htdemucs_ft`。吉他 / 钢琴单独一轨见 `htdemucs_6s`。
 
 ## 下载来源
 
@@ -18,7 +20,7 @@ https://huggingface.co/adefossez/HTDemucs
 
 ```bash
 cd explore/light_demucs
-.venv/bin/python scripts/install_htdemucs.py
+.venv/bin/python scripts/install_model.py htdemucs
 ```
 
 ## 运行框架

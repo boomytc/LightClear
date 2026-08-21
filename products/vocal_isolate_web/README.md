@@ -28,5 +28,5 @@ uv pip install -e .
 
 ```bash
 cd ../../explore/light_demucs
-.venv/bin/python scripts/install_htdemucs.py ../../products/vocal_isolate_web/models/htdemucs
+.venv/bin/python scripts/install_model.py htdemucs ../../products/vocal_isolate_web/models/htdemucs
 ```

@@ -6,13 +6,15 @@ Demucs 探索模块。把混合音频拆成人声或分轨，让目标层听得�
 from demucs.api import Separator
 ```
 
-默认模型 `htdemucs`。权重只放在本模块 `models/htdemucs/`。首次安装：
+默认模型 `htdemucs`（四轨）。另外两档：`htdemucs_ft`（同四轨质量袋）、`htdemucs_6s`（六轨，含 guitar / piano）。权重放在本模块 `models/<model>/`。首次安装：
 
 ```bash
-.venv/bin/python scripts/install_htdemucs.py
+.venv/bin/python scripts/install_model.py htdemucs
+.venv/bin/python scripts/install_model.py htdemucs_ft
+.venv/bin/python scripts/install_model.py htdemucs_6s
 ```
 
-产品要单独装到它自己的 `models/htdemucs`，不要运行时读取本目录。
+产品要单独装到它自己的 `models/<model>`，不要运行时读取本目录。`vocal_isolate_web` 目前只装 `htdemucs`。
 
 ## 安装
 
@@ -30,6 +32,8 @@ uv pip install -e .
 ```bash
 .venv/bin/python demo/demo_vocals.py
 .venv/bin/python demo/demo_stems.py
+.venv/bin/python demo/demo_htdemucs_ft.py
+.venv/bin/python demo/demo_htdemucs_6s.py
 ```
 
 样例来自仓库根 `assets/audio/music/`。默认 demo 用 `next_station_heaven.mp3`（带唱短片段，仅供本机演示）。`test.mp3` 是上游烟雾片，人声能量很低。输出写入本模块 `outputs/`。

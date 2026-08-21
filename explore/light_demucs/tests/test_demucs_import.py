@@ -37,18 +37,47 @@ def compile_demos() -> list[str]:
             raise AssertionError(f"{path.name} missing {IMPORT_LINE!r}")
         if "def " in text:
             raise AssertionError(f"{path.name} must not define functions")
-    required = {"demo_vocals.py", "demo_stems.py"}
+        if path.name == "demo_htdemucs_ft.py" and 'MODEL_NAME = "htdemucs_ft"' not in text:
+            raise AssertionError("demo_htdemucs_ft.py must pin MODEL_NAME = \"htdemucs_ft\"")
+        if path.name == "demo_htdemucs_6s.py":
+            if 'MODEL_NAME = "htdemucs_6s"' not in text:
+                raise AssertionError("demo_htdemucs_6s.py must pin MODEL_NAME = \"htdemucs_6s\"")
+            if '"guitar"' not in text or '"piano"' not in text:
+                raise AssertionError("demo_htdemucs_6s.py must write guitar and piano stems")
+    required = {
+        "demo_vocals.py",
+        "demo_stems.py",
+        "demo_htdemucs_ft.py",
+        "demo_htdemucs_6s.py",
+    }
     missing = sorted(required.difference(names))
     if missing:
         raise AssertionError(f"missing demo scripts: {missing}")
     return names
 
 
+def compile_installer() -> str:
+    path = MODULE_ROOT / "scripts" / "install_model.py"
+    stale = MODULE_ROOT / "scripts" / "install_htdemucs.py"
+    if stale.exists():
+        raise AssertionError("stale scripts/install_htdemucs.py still present")
+    if not path.is_file():
+        raise AssertionError(f"missing {path}")
+    py_compile.compile(str(path), doraise=True)
+    text = path.read_text(encoding="utf-8")
+    for model_name in ("htdemucs", "htdemucs_ft", "htdemucs_6s"):
+        if f'"{model_name}"' not in text:
+            raise AssertionError(f"install_model.py missing {model_name!r}")
+    return path.name
+
+
 def main() -> None:
     name = load_separator_name()
     demos = compile_demos()
+    installer = compile_installer()
     print(f"import_name={name}")
     print("demos=" + ",".join(demos))
+    print(f"installer={installer}")
 
 
 if __name__ == "__main__":

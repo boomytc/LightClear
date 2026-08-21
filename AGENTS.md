@@ -6,7 +6,7 @@
 - 仓库根只做路由与规范，不是可安装 Python 项目，不承担统一依赖或共享运行时。
 - 将每个 `explore/light_*` 目录视为独立 Python 项目根。编辑、运行、测试、安装或调试前，先 `cd` 到该目录并遵循其 `AGENTS.md`。
 - 将每个 `products/<product_name>/` 视为独立产品根。编辑、运行、测试、安装或调试前，先 `cd` 到该目录并遵循其 `AGENTS.md`。
-- `explore/` 是音频变清晰探索层。当前家族：`explore/light_clearvoice`（ClearVoice：SE / SS / SR / TSE）与 `explore/light_demucs`（Demucs：人声隔离 / 分轨）。新上游开新的 `explore/light_*`，不要按任务拆 ClearVoice，也不要折进已有家族。
+- `explore/` 是音频变清晰探索层。当前家族：`explore/light_clearvoice`（ClearVoice：SE / SS / SR / TSE）与 `explore/light_demucs`（Demucs：人声隔离 / 四轨 / 六轨）。新上游开新的 `explore/light_*`，不要按任务拆 ClearVoice，也不要折进已有家族。
 - 根目录 `products/` 是稳定应用层。产品运行时代码必须自包含，不得 import explore，不得读取仓库根或兄弟目录的 `third_party/`、`.venv`。
 - 不要在仓库根重新引入 `pyproject.toml`、`third_party/`、`models/` 或 `demo/`。
 - 根目录 `assets/` 是 explore 共享样例池（见 `assets/README.md`）。产品运行时不得读取；需要样例时拷进产品自己的 `assets/`。
@@ -33,7 +33,7 @@
 ## Refactor Rules
 
 - 保持 vendored runtime 在模块或产品本地 `third_party/`。
-- ClearVoice 中心模型目录：`/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重各放在使用方自己的 `models/htdemucs/`（explore 一份、产品一份），运行时互不读取。缺权重直接失败，不要回退家庭缓存。以后若有第二个产品要用，再单独做指向。
+- ClearVoice 中心模型目录：`/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重各放在使用方自己的 `models/<model>/`（explore 按模型分子目录；`vocal_isolate_web` 目前只装 `htdemucs`），运行时互不读取。缺权重直接失败，不要回退家庭缓存。以后若有第二个产品要用，再单独做指向。
 - 允许在当前模块 `third_party/` 上做该家族需要的上游修改。官方更新后单独判断是否同步，不要自动覆盖，也不要改兄弟模块的副本。优先在 demo 或产品层适配。
 - 缺依赖、缺模型或路径错误应显式暴露直接错误，不要回退到旧根路径。
 - 不要添加共享 SDK 或把各产品 WebUI 合成全模型管理台。

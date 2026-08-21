@@ -6,7 +6,7 @@
 - 将每个 `explore/light_*` 目录视为独立 Python 项目根目录。
 - 当前探索家族：
   - `light_clearvoice`：上游 ClearVoice，覆盖 SE / SS / SR / TSE。不要再拆成 `light_se` / `light_ss` / `light_sr` / `light_tse`。
-  - `light_demucs`：上游 Demucs，覆盖人声隔离与音乐分轨。不要折进 `light_clearvoice`。
+  - `light_demucs`：上游 Demucs，覆盖人声隔离、四轨分轨、同四轨质量档与六轨分轨。不要折进 `light_clearvoice`。
 - 编辑、运行、测试、安装或调试前，先 `cd` 到对应模块目录并遵循该模块自己的 `AGENTS.md`。
 - `explore/` 不是共享 Python 包、共享运行时根目录或稳定产品根目录。
 - 新上游家族开新的 `explore/light_*`，不要折进已有家族。
