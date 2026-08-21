@@ -16,7 +16,7 @@
 ## Layout
 
 - `backend/app.py`：FastAPI 入口。
-- `backend/runtime.py`：ClearVoice 加载与两路分离。
+- `backend/runtime.py`：ClearVoice 加载与两路说话人分离。
 - `third_party/clearvoice`：产品本地 vendored 运行时。
 - `assets/input_ss.wav`：产品自有样例。
 - `workspace/uploads/`、`workspace/outputs/`：运行产物。

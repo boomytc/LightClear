@@ -3,9 +3,9 @@
 ## Scope
 
 - 本文件只适用于 `explore/light_clearvoice` 目录内的工作。
-- 将本目录视为独立 Python 项目根目录；编辑、运行、测试、安装或调试前先 `cd explore/light_clearvoice`。
+- 将本目录视为独立 Python 项目根目录。在本模块目录内编辑、运行、测试、安装；从仓库根进入则 `cd explore/light_clearvoice`。
 - 不要使用仓库根目录作为本项目 Python 根目录。
-- 本模块是 ClearVoice 这一份上游运行时的探索家族，同时覆盖语音增强、语音分离、语音超分辨率和音视频目标说话人提取。不要再拆成多个 `light_*` 任务模块。
+- 本模块是 ClearVoice 这一份上游运行时的探索家族，同时覆盖语音增强、说话人分离、语音超分辨率和音视频目标说话人提取。不要再拆成多个 `light_*` 任务模块。Demucs 在兄弟目录 `light_demucs`，不要折进来。
 
 ## Environment
 

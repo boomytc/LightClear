@@ -9,6 +9,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_ROOT_PATHS = ("pyproject.toml", "demo", "third_party", "models")
 FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf")
 SKIP_PARTS = {"third_party", ".venv", "__pycache__", ".git"}
+REQUIRED_EXPLORE = ("explore/light_clearvoice", "explore/light_demucs")
+STALE_DOC_PHRASES = (
+    "当前只有 explore/light_clearvoice",
+    "唯一上游家族",
+    "第二个上游",
+)
 
 
 def git_ls_files() -> list[str]:
@@ -44,6 +50,10 @@ def main() -> None:
         if path.exists():
             fail(f"repo-root {name} still exists")
 
+    for relative in REQUIRED_EXPLORE:
+        if not (REPO_ROOT / relative / "pyproject.toml").is_file():
+            fail(f"missing explore family {relative}")
+
     tracked = git_ls_files()
     for relative in tracked:
         if relative.endswith(FORBIDDEN_SUFFIXES):
@@ -74,6 +84,10 @@ def main() -> None:
             text = (REPO_ROOT / relative).read_text(encoding="utf-8")
             if "clearvoice_samples" in text:
                 fail(f"{relative} still mentions retired sample tree")
+            if relative.endswith(".md"):
+                for phrase in STALE_DOC_PHRASES:
+                    if phrase in text:
+                        fail(f"{relative} still says {phrase!r}")
 
     print("layout_ok")
     print(f"tracked_files={len(tracked)}")

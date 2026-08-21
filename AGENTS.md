@@ -33,7 +33,7 @@
 ## Refactor Rules
 
 - 保持 vendored runtime 在模块或产品本地 `third_party/`。
-- 中心模型目录：`/Users/boom/Model/{SE,SS,SR,MSS}/`。ClearVoice 用 SE/SS/SR；Demucs 可选 MSS，未指定时走 Hugging Face。
+- ClearVoice 中心模型目录：`/Users/boom/Model/{SE,SS,SR}/`。Demucs 默认 Hugging Face，可选本地仓 `/Users/boom/Model/MSS/`。
 - 允许在当前模块 `third_party/` 上做该家族需要的上游修改。官方更新后单独判断是否同步，不要自动覆盖，也不要改兄弟模块的副本。优先在 demo 或产品层适配。
 - 缺依赖、缺模型或路径错误应显式暴露直接错误，不要回退到旧根路径。
 - 不要添加共享 SDK 或把三个 WebUI 合成全模型管理台。

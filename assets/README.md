@@ -32,7 +32,7 @@ assets/
 | 文件 | 用途 |
 | --- | --- |
 | `manifests/se.scp` | 语音增强批处理 |
-| `manifests/ss.scp` | 语音分离批处理 |
+| `manifests/ss.scp` | 说话人分离批处理 |
 | `manifests/sr.scp` | 语音超分辨率批处理 |
 | `manifests/tse.scp` | 目标说话人提取批处理 |
 | `audio/music/test.mp3` | Demucs 人声隔离 / 分轨样例 |

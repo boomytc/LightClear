@@ -3,7 +3,7 @@
 ## Scope
 
 - 本文件只适用于 `explore/light_demucs` 目录内的工作。
-- 将本目录视为独立 Python 项目根目录；编辑、运行、测试、安装或调试前先 `cd explore/light_demucs`。
+- 将本目录视为独立 Python 项目根目录。在本模块目录内编辑、运行、测试、安装；从仓库根进入则 `cd explore/light_demucs`。
 - 不要使用仓库根目录作为本项目 Python 根目录。
 - 本模块是 Demucs 这一份上游运行时的探索家族，覆盖人声隔离与音乐分轨。不要折进 `light_clearvoice`，也不要按声部再拆模块。
 
@@ -22,7 +22,7 @@
 - 可选中心模型目录：`/Users/boom/Model/MSS/`。未指定本地仓时，`Separator(repo=None)` 从 Hugging Face `adefossez/*` 加载。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
-- 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离）。
+- 当前没有 Demucs 产品。不要在本模块内新增 WebUI 或产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。
 
 ## Runtime Rules
 

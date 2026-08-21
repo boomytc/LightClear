@@ -1,6 +1,6 @@
 # Speech Separation FastAPI WebUI
 
-独立的 LightClear 语音分离 WebUI。默认模型 `MossFormer2_SS_16K`。后端 FastAPI 暴露 `/api/*`，前端是 `frontend/` 下的静态 HTML/CSS/JS。输出两路说话人。
+独立的 LightClear 说话人分离 WebUI。默认模型 `MossFormer2_SS_16K`。后端 FastAPI 暴露 `/api/*`，前端是 `frontend/` 下的静态 HTML/CSS/JS。输出两路说话人，不是 Demucs 分轨。
 
 ## 运行
 

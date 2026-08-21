@@ -5,7 +5,7 @@
 - 本文件只适用于 `products/speech_enhance_web`。
 - 将本目录视为独立产品根目录；先 `cd products/speech_enhance_web`。
 - 默认模型 `MossFormer2_SE_48K`，任务 `speech_enhancement`。
-- 运行时不得 import `explore.light_clearvoice`，不得读取仓库根或 explore 的 `third_party/`。
+- 运行时不得 import explore，不得读取仓库根或任何 `explore/light_*` 的 `third_party/`。
 
 ## Environment
 

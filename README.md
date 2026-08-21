@@ -64,7 +64,7 @@ uv pip install -e .
 .venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 7860
 ```
 
-分离与超分产品把目录换成 `speech_separation_web` 或 `speech_super_resolution_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。Demucs 尚未产品化，不要接到 `speech_separation_web`。
+说话人分离与超分产品把目录换成 `speech_separation_web` 或 `speech_super_resolution_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。Demucs 尚未产品化，不要接到 `speech_separation_web`。
 
 ## 验证
 
