@@ -255,6 +255,12 @@ async def isolate(
 
     waveform_window = max(1.0, min(float(waveform_seconds), 30.0))
 
+    if not model_is_available(PRODUCT_ROOT):
+        raise HTTPException(
+            status_code=503,
+            detail=f"中心模型目录未就绪: {model_checkpoint_dir(PRODUCT_ROOT)}",
+        )
+
     try:
         model_ready_start = time.perf_counter()
         model_handle = get_model_handle()

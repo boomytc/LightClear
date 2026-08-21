@@ -107,7 +107,7 @@ function sampleAudioUrl(path) {
 function updateIsolateButton() {
   const hasSample = state.source === "sample" && Boolean(selectedSample());
   const hasUpload = state.source === "upload" && el.uploadFile.files.length > 0;
-  el.isolateButton.disabled = state.busy || !(hasSample || hasUpload);
+  el.isolateButton.disabled = state.busy || !state.modelAvailable || !(hasSample || hasUpload);
 }
 
 function setBusy(isBusy) {
@@ -311,8 +311,8 @@ async function loadHealth() {
   if (state.modelAvailable) {
     setBadge("status-ready", "模型就绪");
   } else {
-    setBadge("status-idle", "首次将下载");
-    setStatus("本地尚未缓存权重，第一次隔离会从 Hugging Face 下载。");
+    setBadge("status-missing", "模型未就绪");
+    setStatus("中心模型目录未就绪，先安装到 /Users/boom/Model/MSS/htdemucs", true);
   }
   updateIsolateButton();
 }

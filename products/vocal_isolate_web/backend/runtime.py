@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import hashlib
-import os
 import re
 import sys
 import time
@@ -14,7 +13,7 @@ MODEL_NAME = "htdemucs"
 TASK_NAME = "vocal_isolation"
 DEFAULT_OUTPUT_DIR = "workspace/outputs"
 MSS_ROOT = Path("/Users/boom/Model/MSS")
-HF_CACHE_DIR = Path.home() / ".cache" / "huggingface" / "hub" / "models--adefossez--HTDemucs"
+MODEL_REPO = MSS_ROOT / MODEL_NAME
 SAMPLE_AUDIO_FILES = ("assets/next_station_heaven.mp3",)
 STEM_NAMES = ("vocals", "accompaniment", "drums", "bass", "other")
 DEVICE = "cpu"
@@ -46,20 +45,29 @@ def bootstrap_product_paths(product_root: Path) -> None:
         sys.path.insert(0, third_party_dir)
 
 
-def local_model_repo() -> Path | None:
-    if MSS_ROOT.is_dir() and any(MSS_ROOT.iterdir()):
-        return MSS_ROOT
-    return None
+def model_checkpoint_dir(product_root: Path) -> Path:
+    return MODEL_REPO
+
+
+def model_is_available(product_root: Path) -> bool:
+    yaml_path = MODEL_REPO / f"{MODEL_NAME}.yaml"
+    if not yaml_path.is_file():
+        return False
+    return any(path.suffix == ".th" for path in MODEL_REPO.glob("*.th"))
 
 
 def load_htdemucs(product_root: Path) -> ModelHandle:
     bootstrap_product_paths(product_root)
+    if not model_is_available(product_root):
+        raise FileNotFoundError(
+            f"中心模型目录未就绪: {MODEL_REPO}。先运行 explore/light_demucs/scripts/install_htdemucs.py"
+        )
     from demucs.api import Separator
 
     start_time = time.perf_counter()
     separator = Separator(
         model=MODEL_NAME,
-        repo=local_model_repo(),
+        repo=MODEL_REPO,
         device=DEVICE,
         shifts=SHIFTS,
         overlap=OVERLAP,
@@ -70,25 +78,6 @@ def load_htdemucs(product_root: Path) -> ModelHandle:
         separator=separator,
         initial_load_seconds=time.perf_counter() - start_time,
     )
-
-
-def model_checkpoint_dir(product_root: Path) -> Path:
-    repo = local_model_repo()
-    if repo is not None:
-        return repo
-    return HF_CACHE_DIR
-
-
-def model_is_available(product_root: Path) -> bool:
-    repo = local_model_repo()
-    if repo is not None:
-        return any(repo.iterdir())
-    if not HF_CACHE_DIR.is_dir():
-        return False
-    for _root, _dirs, files in os.walk(HF_CACHE_DIR):
-        if files:
-            return True
-    return False
 
 
 def list_sample_audio(product_root: Path) -> list[Path]:

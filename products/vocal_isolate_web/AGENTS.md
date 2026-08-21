@@ -20,7 +20,7 @@
 - `third_party/demucs`：产品本地 vendored 运行时，来自 `explore/light_demucs/third_party/demucs`。
 - `assets/next_station_heaven.mp3`：产品自有带唱短样例。
 - `workspace/uploads/`、`workspace/outputs/`：运行产物。
-- 权重默认 Hugging Face `adefossez/HTDemucs`。仅当 `/Users/boom/Model/MSS/` 存在且非空时用本地仓；空目录或缺失都走 Hub，不读 explore。
+- 权重只读 `/Users/boom/Model/MSS/htdemucs`。缺失时 health 为未就绪，推理直接失败。安装脚本在 `explore/light_demucs/scripts/install_htdemucs.py`。不使用 `~/.cache/huggingface`。
 
 ## Validation
 
