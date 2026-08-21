@@ -22,7 +22,7 @@
 - 可选中心模型目录：`/Users/boom/Model/MSS/`。未指定本地仓时，`Separator(repo=None)` 从 Hugging Face `adefossez/*` 加载。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
-- 当前没有 Demucs 产品。不要在本模块内新增 WebUI 或产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。
+- 稳定产品入口是 `../../products/vocal_isolate_web/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。
 
 ## Runtime Rules
 

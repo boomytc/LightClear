@@ -13,7 +13,7 @@
 - 产品运行时代码只从产品目录解析路径。
 - 产品不得读取任何 `explore/light_*` 的 `third_party/`、`.venv`、`demo/` 或依赖元数据。
 - 产品不得依赖仓库根 `assets/`；需要样例时拷进产品自己的 `assets/`。
-- 不要把新产品做成全模型管理台；按任务拆分入口。
+- 不要把新产品做成全模型管理台；按任务拆分入口。`vocal_isolate_web` 是人声隔离，不要接到 `speech_separation_web`。
 
 ## Environment
 

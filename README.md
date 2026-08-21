@@ -20,7 +20,8 @@ LightClear/
 ├── products/
 │   ├── speech_enhance_web/
 │   ├── speech_separation_web/
-│   └── speech_super_resolution_web/
+│   ├── speech_super_resolution_web/
+│   └── vocal_isolate_web/
 ├── AGENTS.md
 ├── Makefile
 └── README.md
@@ -34,6 +35,7 @@ LightClear/
 | `products/speech_enhance_web/` | 语音增强 WebUI，默认 `MossFormer2_SE_48K`。 |
 | `products/speech_separation_web/` | 说话人分离 WebUI，默认 `MossFormer2_SS_16K`。 |
 | `products/speech_super_resolution_web/` | 语音超分辨率 WebUI，默认 `MossFormer2_SR_48K`。 |
+| `products/vocal_isolate_web/` | 人声隔离 WebUI，默认 `htdemucs`。 |
 
 ## 探索模块
 
@@ -64,7 +66,7 @@ uv pip install -e .
 .venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 7860
 ```
 
-说话人分离与超分产品把目录换成 `speech_separation_web` 或 `speech_super_resolution_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。Demucs 尚未产品化，不要接到 `speech_separation_web`。
+说话人分离、超分、人声隔离分别把目录换成 `speech_separation_web`、`speech_super_resolution_web` 或 `vocal_isolate_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。人声隔离不要接到 `speech_separation_web`。
 
 ## 验证
 
@@ -78,6 +80,9 @@ cd ../light_demucs
 .venv/bin/python -m tests.test_demucs_import
 
 cd ../../products/speech_enhance_web
+.venv/bin/python -m tests.test_health
+
+cd ../vocal_isolate_web
 .venv/bin/python -m tests.test_health
 
 cd ../..

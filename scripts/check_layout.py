@@ -10,10 +10,17 @@ FORBIDDEN_ROOT_PATHS = ("pyproject.toml", "demo", "third_party", "models")
 FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf")
 SKIP_PARTS = {"third_party", ".venv", "__pycache__", ".git"}
 REQUIRED_EXPLORE = ("explore/light_clearvoice", "explore/light_demucs")
+REQUIRED_PRODUCTS = (
+    "products/speech_enhance_web",
+    "products/speech_separation_web",
+    "products/speech_super_resolution_web",
+    "products/vocal_isolate_web",
+)
 STALE_DOC_PHRASES = (
     "当前只有 explore/light_clearvoice",
     "唯一上游家族",
     "第二个上游",
+    "Demucs 尚未产品化",
 )
 
 
@@ -54,6 +61,10 @@ def main() -> None:
         if not (REPO_ROOT / relative / "pyproject.toml").is_file():
             fail(f"missing explore family {relative}")
 
+    for relative in REQUIRED_PRODUCTS:
+        if not (REPO_ROOT / relative / "pyproject.toml").is_file():
+            fail(f"missing product {relative}")
+
     tracked = git_ls_files()
     for relative in tracked:
         if relative.endswith(FORBIDDEN_SUFFIXES):
@@ -72,8 +83,8 @@ def main() -> None:
 
     for path in iter_tracked_files((".md",)):
         text = path.read_text(encoding="utf-8")
-        if "uvicorn products.speech_" in text:
-            fail(f"{path.relative_to(REPO_ROOT)} still documents uvicorn products.speech_* launch")
+        if "uvicorn products.speech_" in text or "uvicorn products.vocal_" in text:
+            fail(f"{path.relative_to(REPO_ROOT)} still documents uvicorn products.* launch")
         if 'uv pip install -e ".[web]"' in text or "uv pip install -e '.[web]'" in text:
             fail(f"{path.relative_to(REPO_ROOT)} still documents root extra web install")
 
