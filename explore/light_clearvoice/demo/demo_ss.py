@@ -10,9 +10,9 @@ from clearvoice import ClearVoice
 
 TASK_NAME = "speech_separation"
 MODEL_NAME = "MossFormer2_SS_16K"
-INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/input_ss.wav"
-INPUT_DIR = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/path_to_input_wavs_ss"
-INPUT_SCP = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/scp/audio_samples_mix.scp"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/audio/mixture/input_ss.wav"
+INPUT_DIR = "/Users/boom/workspace/LightClear/assets/audio/mixture"
+INPUT_SCP = "/Users/boom/workspace/LightClear/assets/manifests/ss.scp"
 OUTPUT_FILE = str(MODULE_ROOT / "outputs" / "MossFormer2_SS_16K" / "input_ss.wav")
 OUTPUT_DIR = str(MODULE_ROOT / "outputs" / "MossFormer2_SS_16K" / "path_to_output_wavs")
 OUTPUT_SCP_DIR = str(MODULE_ROOT / "outputs" / "MossFormer2_SS_16K" / "path_to_output_wavs_scp")

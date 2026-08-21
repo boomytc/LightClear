@@ -10,9 +10,9 @@ from clearvoice import ClearVoice
 
 TASK_NAME = "speech_enhancement"
 MODEL_NAME = "MossFormerGAN_SE_16K"
-INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/test.wav"
-INPUT_DIR = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/path_to_input_wavs"
-INPUT_SCP = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/scp/audio_samples.scp"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/audio/noisy/test.wav"
+INPUT_DIR = "/Users/boom/workspace/LightClear/assets/audio/noisy"
+INPUT_SCP = "/Users/boom/workspace/LightClear/assets/manifests/se.scp"
 OUTPUT_FILE = str(MODULE_ROOT / "outputs" / "MossFormerGAN_SE_16K" / "test.wav")
 OUTPUT_DIR = str(MODULE_ROOT / "outputs" / "MossFormerGAN_SE_16K" / "path_to_output_wavs")
 OUTPUT_SCP_DIR = str(MODULE_ROOT / "outputs" / "MossFormerGAN_SE_16K" / "path_to_output_wavs_scp")

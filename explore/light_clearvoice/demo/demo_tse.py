@@ -10,9 +10,9 @@ from clearvoice import ClearVoice
 
 TASK_NAME = "target_speaker_extraction"
 MODEL_NAME = "AV_MossFormer2_TSE_16K"
-INPUT_VIDEO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/path_to_input_videos_tse/001.avi"
-INPUT_VIDEO_DIR = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/path_to_input_videos_tse"
-INPUT_VIDEO_SCP = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/scp/video_samples.scp"
+INPUT_VIDEO = "/Users/boom/workspace/LightClear/assets/video/speech/001.avi"
+INPUT_VIDEO_DIR = "/Users/boom/workspace/LightClear/assets/video/speech"
+INPUT_VIDEO_SCP = "/Users/boom/workspace/LightClear/assets/manifests/tse.scp"
 OUTPUT_VIDEO = str(MODULE_ROOT / "outputs" / "AV_MossFormer2_TSE_16K" / "single_video")
 OUTPUT_VIDEO_DIR = str(MODULE_ROOT / "outputs" / "AV_MossFormer2_TSE_16K" / "path_to_output_videos")
 OUTPUT_VIDEO_SCP_DIR = str(MODULE_ROOT / "outputs" / "AV_MossFormer2_TSE_16K" / "path_to_output_videos_scp")

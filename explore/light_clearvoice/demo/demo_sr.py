@@ -10,9 +10,9 @@ from clearvoice import ClearVoice
 
 TASK_NAME = "speech_super_resolution"
 MODEL_NAME = "MossFormer2_SR_48K"
-INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/input_sr.wav"
-INPUT_DIR = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/path_to_input_wavs_sr"
-INPUT_SCP = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/scp/audio_samples_sr.scp"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/audio/bandlimited/input_sr.wav"
+INPUT_DIR = "/Users/boom/workspace/LightClear/assets/audio/bandlimited"
+INPUT_SCP = "/Users/boom/workspace/LightClear/assets/manifests/sr.scp"
 OUTPUT_FILE = str(MODULE_ROOT / "outputs" / "MossFormer2_SR_48K" / "input_sr.wav")
 OUTPUT_DIR = str(MODULE_ROOT / "outputs" / "MossFormer2_SR_48K" / "path_to_output_wavs")
 OUTPUT_SCP_DIR = str(MODULE_ROOT / "outputs" / "MossFormer2_SR_48K" / "path_to_output_wavs_scp")

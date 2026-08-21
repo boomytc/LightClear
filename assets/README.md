@@ -1,0 +1,35 @@
+# LightClear 共享样例资源
+
+仓库根 `assets/` 是 explore 层共享输入素材池，不是产品运行时资源。`products/**/assets` 仍由各产品自有。
+
+## 布局
+
+```text
+assets/
+  audio/noisy/          # 带噪语音，供语音增强
+  audio/mixture/        # 混合语音，供说话人分离
+  audio/bandlimited/    # 带限语音，供超分辨率
+  video/speech/         # 含人脸与语音的视频，供目标说话人提取
+  manifests/            # 批处理 .scp 清单，路径为绝对路径
+```
+
+## 分类规则
+
+- 第一级按介质：`audio/` / `video/`。
+- 第二级按用途：`noisy`、`mixture`、`bandlimited`、`speech`。
+- 同内容只保留一份。产品需要样例时拷进产品自己的 `assets/`，不要运行时读取本目录。
+
+## 使用规则
+
+- Demo / CLI 顶部显式写出绝对路径，例如 `/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav`。
+- 批量输入使用 `manifests/*.scp` 中列出的路径，或把明确的目录路径交给 ClearVoice 的目录输入 API。
+- 不要把本目录当作产品默认样例池去 `glob`。
+
+## 清单
+
+| 文件 | 用途 |
+| --- | --- |
+| `manifests/se.scp` | 语音增强批处理 |
+| `manifests/ss.scp` | 语音分离批处理 |
+| `manifests/sr.scp` | 语音超分辨率批处理 |
+| `manifests/tse.scp` | 目标说话人提取批处理 |

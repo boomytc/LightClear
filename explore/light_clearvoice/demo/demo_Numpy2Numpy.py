@@ -15,7 +15,7 @@ from clearvoice import ClearVoice
 TASK_NAME = "speech_enhancement"
 MODEL_NAME = "MossFormer2_SE_48K"
 SAMPLE_RATE = 48000
-INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/input.wav"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav"
 OUTPUT_AUDIO = str(MODULE_ROOT / "outputs" / "numpy2numpy" / "MossFormer2_SE_48K_batch.wav")
 
 myClearVoice = ClearVoice(task=TASK_NAME, model_names=[MODEL_NAME])

@@ -16,7 +16,7 @@ from clearvoice import ClearVoice
 TASK_NAME = "speech_enhancement"
 MODEL_NAME = "FRCRN_SE_16K"
 SAMPLE_RATE = 16000
-INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/clearvoice_samples/input.wav"
+INPUT_AUDIO = "/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav"
 OUTPUT_NUMPY_AUDIO = str(MODULE_ROOT / "outputs" / "tensor2tensor" / "FRCRN_SE_16K_numpy.wav")
 OUTPUT_TORCH_AUDIO = str(MODULE_ROOT / "outputs" / "tensor2tensor" / "FRCRN_SE_16K_torch.wav")
 
