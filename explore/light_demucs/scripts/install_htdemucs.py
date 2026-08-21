@@ -1,8 +1,9 @@
-"""Install htdemucs into a Demucs local repo under this project.
+"""Install htdemucs into a Demucs local repo.
 
-Default destination is explore/light_demucs/models/htdemucs.
-Pass a directory to install elsewhere (for example the vocal_isolate_web product).
+Default destination is this module's models/htdemucs.
+Pass another directory to install a second copy (for example a product).
 Scratch downloads stay under that destination's .download and are deleted afterwards.
+This script does not write ~/.cache/huggingface and does not copy into other modules.
 """
 
 from __future__ import annotations
@@ -16,13 +17,11 @@ import yaml
 
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = MODULE_ROOT.parents[1]
 THIRD_PARTY_DIR = MODULE_ROOT / "third_party"
 if str(THIRD_PARTY_DIR) not in sys.path:
     sys.path.insert(0, str(THIRD_PARTY_DIR))
 
 DEFAULT_DIR = MODULE_ROOT / "models" / "htdemucs"
-PRODUCT_DIR = REPO_ROOT / "products" / "vocal_isolate_web" / "models" / "htdemucs"
 HF_REPO_ID = "adefossez/HTDemucs"
 MODEL_NAME = "htdemucs"
 
@@ -53,18 +52,6 @@ def export_th(safetensors_path: Path, dest_th: Path) -> None:
     )
 
 
-def find_snapshot() -> Path | None:
-    hub = Path.home() / ".cache" / "huggingface" / "hub" / "models--adefossez--HTDemucs" / "snapshots"
-    if not hub.is_dir():
-        return None
-    snapshots = sorted(path for path in hub.iterdir() if path.is_dir())
-    for snapshot in reversed(snapshots):
-        yaml_path = snapshot / f"{MODEL_NAME}.yaml"
-        if yaml_path.is_file():
-            return snapshot
-    return None
-
-
 def download_snapshot(scratch: Path) -> Path:
     from huggingface_hub import snapshot_download
 
@@ -83,12 +70,8 @@ def repo_is_ready(dest: Path) -> bool:
 def install(dest: Path) -> Path:
     dest.mkdir(parents=True, exist_ok=True)
     yaml_dest = dest / f"{MODEL_NAME}.yaml"
-    source = find_snapshot()
     scratch = dest / ".download"
-    created_scratch = False
-    if source is None:
-        source = download_snapshot(scratch)
-        created_scratch = True
+    source = download_snapshot(scratch)
 
     shutil.copy2(source / f"{MODEL_NAME}.yaml", yaml_dest)
     bag = yaml.safe_load(yaml_dest.read_text(encoding="utf-8"))
@@ -98,26 +81,15 @@ def install(dest: Path) -> Path:
             raise FileNotFoundError(f"missing {safetensors_path}")
         export_th(safetensors_path, dest / f"{sig}.th")
 
-    if created_scratch and scratch.exists():
+    if scratch.exists():
         shutil.rmtree(scratch)
     return dest
-
-
-def copy_repo(src: Path, dest: Path) -> None:
-    dest.mkdir(parents=True, exist_ok=True)
-    for path in src.iterdir():
-        if path.name.startswith(".") or path.is_dir():
-            continue
-        shutil.copy2(path, dest / path.name)
 
 
 if __name__ == "__main__":
     dest = Path(sys.argv[1]).expanduser().resolve() if len(sys.argv) > 1 else DEFAULT_DIR.resolve()
     path = dest if repo_is_ready(dest) else install(dest)
     print(f"installed {MODEL_NAME} -> {path}")
-    if dest == DEFAULT_DIR.resolve() and PRODUCT_DIR.parent.parent.is_dir():
-        copy_repo(path, PRODUCT_DIR)
-        print(f"copied -> {PRODUCT_DIR}")
     for child in sorted(path.iterdir()):
         if child.name.startswith("."):
             continue

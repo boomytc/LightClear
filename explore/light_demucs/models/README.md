@@ -6,4 +6,4 @@
 .venv/bin/python scripts/install_htdemucs.py
 ```
 
-默认写入 `htdemucs/`。若产品目录存在，安装脚本会再拷一份到 `products/vocal_isolate_web/models/htdemucs`。运行时互不读取。
+写入 `htdemucs/`。产品不读取本目录；产品需要时单独安装到它自己的 `models/htdemucs`。

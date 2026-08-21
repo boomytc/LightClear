@@ -12,6 +12,8 @@ from demucs.api import Separator
 .venv/bin/python scripts/install_htdemucs.py
 ```
 
+产品要单独装到它自己的 `models/htdemucs`，不要运行时读取本目录。
+
 ## 安装
 
 在本模块目录内执行：

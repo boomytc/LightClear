@@ -21,6 +21,7 @@ STALE_DOC_PHRASES = (
     "唯一上游家族",
     "第二个上游",
     "Demucs 尚未产品化",
+    "/Users/boom/Model/MSS",
 )
 
 

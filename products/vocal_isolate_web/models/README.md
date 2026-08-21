@@ -6,5 +6,3 @@
 cd ../../explore/light_demucs
 .venv/bin/python scripts/install_htdemucs.py ../../products/vocal_isolate_web/models/htdemucs
 ```
-
-默认安装脚本在 explore 侧执行时也会拷到这里。

@@ -20,7 +20,7 @@
 - `third_party/demucs`：产品本地 vendored 运行时，来自 `explore/light_demucs/third_party/demucs`。
 - `assets/next_station_heaven.mp3`：产品自有带唱短样例。
 - `workspace/uploads/`、`workspace/outputs/`：运行产物。
-- 权重只读本产品 `models/htdemucs/`。缺失时 health 为未就绪，推理直接失败。安装：在 `explore/light_demucs` 运行 `scripts/install_htdemucs.py`（会拷一份到本产品）。不读 explore 运行时，不写 `~/.cache/huggingface`。
+- 权重只读本产品 `models/htdemucs/`。缺失时 health 为未就绪，推理直接失败。安装目标必须显式指向本目录，不读 explore 的 `models/`。
 
 ## Validation
 

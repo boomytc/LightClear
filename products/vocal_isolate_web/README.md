@@ -24,4 +24,9 @@ uv pip install -e .
 - `GET /api/jobs/{job_id}/audio/{original|vocals|accompaniment|drums|bass|other}`：播放。
 - `GET /api/jobs/{job_id}/download/{vocals|accompaniment|drums|bass|other}`：下载。
 
-默认输出写入 `workspace/outputs/`，上传缓存写入 `workspace/uploads/`。权重只读本产品 `models/htdemucs/`。缺失时在 `explore/light_demucs` 运行 `scripts/install_htdemucs.py`。
+默认输出写入 `workspace/outputs/`，上传缓存写入 `workspace/uploads/`。权重只读本产品 `models/htdemucs/`。缺失时：
+
+```bash
+cd ../../explore/light_demucs
+.venv/bin/python scripts/install_htdemucs.py ../../products/vocal_isolate_web/models/htdemucs
+```

@@ -258,7 +258,7 @@ async def isolate(
     if not model_is_available(PRODUCT_ROOT):
         raise HTTPException(
             status_code=503,
-            detail=f"中心模型目录未就绪: {model_checkpoint_dir(PRODUCT_ROOT)}",
+            detail=f"产品模型目录未就绪: {model_checkpoint_dir(PRODUCT_ROOT)}",
         )
 
     try:

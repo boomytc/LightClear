@@ -60,7 +60,7 @@ def load_htdemucs(product_root: Path) -> ModelHandle:
     repo = model_checkpoint_dir(product_root)
     if not model_is_available(product_root):
         raise FileNotFoundError(
-            f"产品模型目录未就绪: {repo}。先运行 explore/light_demucs/scripts/install_htdemucs.py"
+            f"产品模型目录未就绪: {repo}"
         )
     from demucs.api import Separator
 
