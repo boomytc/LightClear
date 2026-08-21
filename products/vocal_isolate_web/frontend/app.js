@@ -312,7 +312,7 @@ async function loadHealth() {
     setBadge("status-ready", "模型就绪");
   } else {
     setBadge("status-missing", "模型未就绪");
-    setStatus("中心模型目录未就绪，先安装到 /Users/boom/Model/MSS/htdemucs", true);
+    setStatus("产品模型目录未就绪，先安装到 models/htdemucs", true);
   }
   updateIsolateButton();
 }

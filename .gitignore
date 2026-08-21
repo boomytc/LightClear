@@ -18,8 +18,12 @@ logs/
 *.pth
 *.pt
 *.ckpt
+*.th
+*.safetensors
 *.pkf
 *.bk
+**/.download/
+**/models/htdemucs/
 
 # 压缩文件
 *.zip

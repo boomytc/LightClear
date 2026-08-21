@@ -19,7 +19,7 @@
 - Python 包源码位于 `third_party/demucs`，公共入口是 `from demucs.api import Separator`。
 - `third_party/demucs` 是 `/Users/boom/workspace/demucs/demucs` 的 vendor 副本（上游 `adefossez/demucs` v4.1.0，`eeac1d15891af95b1288d2884b95baa3e5baa96c`）。允许在这份副本上做本模块需要的上游修改。官方仓库更新后单独判断是否值得同步，不要自动覆盖本地改动。产品 `vocal_isolate_web` 从本模块 `third_party/demucs` 再拷一份，不要从 `workspace/demucs` 直拷。
 - 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`。本模块不保留本地 `models/` 权重目录。
-- 中心模型目录：`/Users/boom/Model/MSS/<model>/`。默认 `htdemucs` 使用 `/Users/boom/Model/MSS/htdemucs`。安装：`.venv/bin/python scripts/install_htdemucs.py`。缺目录直接失败，不要回退 Hugging Face 家庭缓存。
+- 权重目录：本模块 `models/htdemucs/`。安装：`.venv/bin/python scripts/install_htdemucs.py`。缺目录直接失败，不要写到 `~/.cache/huggingface` 或 `/Users/boom/Model/MSS/`。其他产品若以后要用，再单独做指向。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
 - 稳定产品入口是 `../../products/vocal_isolate_web/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。
@@ -35,7 +35,7 @@
 - `.venv/bin/python -c "from demucs.api import Separator; print(Separator.__name__)"`
 - `.venv/bin/python -m py_compile demo/*.py`
 - `.venv/bin/python -m tests.test_demucs_import`
-- 完整推理前确认 `/Users/boom/Model/MSS/htdemucs` 存在。缺权重是环境限制，不是模块缺陷。
+- 完整推理前确认本模块 `models/htdemucs/` 存在。缺权重是环境限制，不是模块缺陷。
 
 ## Cleanup
 

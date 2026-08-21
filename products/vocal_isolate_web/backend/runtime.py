@@ -12,8 +12,6 @@ AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 MODEL_NAME = "htdemucs"
 TASK_NAME = "vocal_isolation"
 DEFAULT_OUTPUT_DIR = "workspace/outputs"
-MSS_ROOT = Path("/Users/boom/Model/MSS")
-MODEL_REPO = MSS_ROOT / MODEL_NAME
 SAMPLE_AUDIO_FILES = ("assets/next_station_heaven.mp3",)
 STEM_NAMES = ("vocals", "accompaniment", "drums", "bass", "other")
 DEVICE = "cpu"
@@ -46,28 +44,30 @@ def bootstrap_product_paths(product_root: Path) -> None:
 
 
 def model_checkpoint_dir(product_root: Path) -> Path:
-    return MODEL_REPO
+    return product_root / "models" / MODEL_NAME
 
 
 def model_is_available(product_root: Path) -> bool:
-    yaml_path = MODEL_REPO / f"{MODEL_NAME}.yaml"
+    repo = model_checkpoint_dir(product_root)
+    yaml_path = repo / f"{MODEL_NAME}.yaml"
     if not yaml_path.is_file():
         return False
-    return any(path.suffix == ".th" for path in MODEL_REPO.glob("*.th"))
+    return any(path.suffix == ".th" for path in repo.glob("*.th"))
 
 
 def load_htdemucs(product_root: Path) -> ModelHandle:
     bootstrap_product_paths(product_root)
+    repo = model_checkpoint_dir(product_root)
     if not model_is_available(product_root):
         raise FileNotFoundError(
-            f"中心模型目录未就绪: {MODEL_REPO}。先运行 explore/light_demucs/scripts/install_htdemucs.py"
+            f"产品模型目录未就绪: {repo}。先运行 explore/light_demucs/scripts/install_htdemucs.py"
         )
     from demucs.api import Separator
 
     start_time = time.perf_counter()
     separator = Separator(
         model=MODEL_NAME,
-        repo=MODEL_REPO,
+        repo=repo,
         device=DEVICE,
         shifts=SHIFTS,
         overlap=OVERLAP,

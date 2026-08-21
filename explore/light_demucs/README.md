@@ -6,7 +6,7 @@ Demucs 探索模块。把混合音频拆成人声或分轨，让目标层听得�
 from demucs.api import Separator
 ```
 
-默认模型 `htdemucs`。权重只从中心目录 `/Users/boom/Model/MSS/htdemucs` 加载。首次安装：
+默认模型 `htdemucs`。权重只放在本模块 `models/htdemucs/`。首次安装：
 
 ```bash
 .venv/bin/python scripts/install_htdemucs.py

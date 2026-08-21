@@ -7,7 +7,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_ROOT_PATHS = ("pyproject.toml", "demo", "third_party", "models")
-FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf")
+FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf", ".th", ".safetensors")
 SKIP_PARTS = {"third_party", ".venv", "__pycache__", ".git"}
 REQUIRED_EXPLORE = ("explore/light_clearvoice", "explore/light_demucs")
 REQUIRED_PRODUCTS = (

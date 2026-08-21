@@ -12,7 +12,7 @@ https://huggingface.co/adefossez/HTDemucs
 
 ## 本地路径
 
-`/Users/boom/Model/MSS/htdemucs`
+`explore/light_demucs/models/htdemucs`
 
 内含 `htdemucs.yaml` 与签名 `.th`。安装：
 
@@ -36,7 +36,7 @@ PyTorch。包源码在 `third_party/demucs`。
 ```python
 from pathlib import Path
 from demucs.api import Separator
-separator = Separator(model="htdemucs", repo=Path("/Users/boom/Model/MSS/htdemucs"), device="cpu", segment=7)
+separator = Separator(model="htdemucs", repo=Path("models/htdemucs"), device="cpu", segment=7)
 origin, stems = separator.separate_audio_file("track.mp3")
 ```
 

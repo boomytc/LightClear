@@ -53,7 +53,7 @@ uv pip install -e .
 .venv/bin/python demo/demo_vocals.py
 ```
 
-ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重使用 `/Users/boom/Model/MSS/htdemucs`。详见各模块 README。
+ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重放在各自模块/产品的 `models/htdemucs/`。详见各模块 README。
 
 ## 产品
 

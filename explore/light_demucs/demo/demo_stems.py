@@ -13,7 +13,7 @@ DEVICE = "cpu"
 SHIFTS = 1
 OVERLAP = 0.25
 SEGMENT = 7
-MODEL_REPO = Path("/Users/boom/Model/MSS/htdemucs")
+MODEL_REPO = MODULE_ROOT / "models" / "htdemucs"
 INPUT_AUDIO = Path("/Users/boom/workspace/LightClear/assets/audio/music/next_station_heaven.mp3")
 OUTPUT_DIR = MODULE_ROOT / "outputs" / MODEL_NAME / INPUT_AUDIO.stem
 
