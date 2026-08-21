@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "speech-super-resolution-web"
+version = "1.0.0"
+description = "Standalone LightClear speech super-resolution FastAPI WebUI"
+requires-python = ">=3.10"
+dependencies = [
+  "einops",
+  "fastapi>=0.115",
+  "httpx",
+  "joblib",
+  "librosa",
+  "matplotlib>=3.8",
+  "numpy",
+  "opencv-python==4.10.0.84",
+  "packaging",
+  "pydub",
+  "python-multipart>=0.0.9",
+  "python_speech_features==0.6",
+  "rotary_embedding_torch==0.8.3",
+  "scenedetect>=0.6.6",
+  "scikit_learn",
+  "scipy>=1.10.1",
+  "soundfile>=0.12.1",
+  "torch>=2.0.1; sys_platform != 'win32'",
+  "torchaudio>=2.0.2; sys_platform != 'win32'",
+  "torchinfo",
+  "torch-complex>=0.4.4",
+  "tqdm",
+  "uvicorn[standard]>=0.30",
+  "yamlargparse",
+  "pesq==0.0.4",
+  "pystoi==0.3.3",
+  "pyyaml",
+  "pysptk",
+  "pymcd",
+  "pyworld",
+  "fastdtw",
+  "museval",
+  "resampy",
+  "onnxruntime",
+  "gammatone",
+  "mir_eval==0.7",
+  "tensorboard==2.14.0",
+  "typeguard==4.3.0",
+  "xls_r_sqa",
+]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = [".", "third_party"]
+include = ["backend*", "clearvoice*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"clearvoice" = ["config/**/*.yaml", "config/**/*.json"]
