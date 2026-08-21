@@ -5,13 +5,13 @@
 - 将每个 `products/<product_name>/` 视为独立产品根目录。
 - 编辑、运行、测试、安装或调试前，先 `cd` 到对应产品目录并遵循该产品自己的 `AGENTS.md`。
 - `products/` 不是共享 Python 包或共享运行时根目录。
-- 产品可以参考 `explore/light_clearvoice` 的 demo 形状，但运行时必须自包含。
+- 产品可以参考对应 explore 家族的 demo 形状，但运行时必须自包含。
 
 ## Product Boundaries
 
 - 每个产品拥有自己的 `pyproject.toml`、`AGENTS.md`、`README.md`、`third_party/`、`assets/`、前端资源和启动方式。
 - 产品运行时代码只从产品目录解析路径。
-- 产品不得读取 `explore/light_clearvoice` 的 `third_party/`、`.venv`、`demo/` 或依赖元数据。
+- 产品不得读取任何 `explore/light_*` 的 `third_party/`、`.venv`、`demo/` 或依赖元数据。
 - 产品不得依赖仓库根 `assets/`；需要样例时拷进产品自己的 `assets/`。
 - 不要把新产品做成全模型管理台；按任务拆分入口。
 

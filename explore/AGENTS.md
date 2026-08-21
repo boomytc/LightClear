@@ -2,19 +2,22 @@
 
 ## Scope
 
-- 本文件适用于 `explore/` 下的语音增强 / 分离 / 超分 / 目标说话人提取探索模块。
+- 本文件适用于 `explore/` 下的音频变清晰探索模块。
 - 将每个 `explore/light_*` 目录视为独立 Python 项目根目录。
-- 当前探索家族只有 `light_clearvoice`（上游 ClearVoice，覆盖 SE / SS / SR / TSE）。不要按任务再拆成 `light_se` / `light_ss` / `light_sr` / `light_tse`。
+- 当前探索家族：
+  - `light_clearvoice`：上游 ClearVoice，覆盖 SE / SS / SR / TSE。不要再拆成 `light_se` / `light_ss` / `light_sr` / `light_tse`。
+  - `light_demucs`：上游 Demucs，覆盖人声隔离与音乐分轨。不要折进 `light_clearvoice`。
 - 编辑、运行、测试、安装或调试前，先 `cd` 到对应模块目录并遵循该模块自己的 `AGENTS.md`。
 - `explore/` 不是共享 Python 包、共享运行时根目录或稳定产品根目录。
-- 新上游家族开新的 `explore/light_*`，不要折进 `light_clearvoice`。
+- 新上游家族开新的 `explore/light_*`，不要折进已有家族。
 
 ## Module Boundaries
 
 - 每个探索模块拥有自己的 `AGENTS.md`、`pyproject.toml`、`third_party/`、`demo/`、文档和运行产物目录。
-- 跨模块共用的样例只放在仓库根 `assets/`。模块不要再拷一份共享 wav。
+- 跨模块共用的样例只放在仓库根 `assets/`。模块不要再拷一份共享音频。
 - 模块运行时代码从模块目录解析路径；`sys.path` 只允许注入本模块 `third_party/`。
 - 稳定 WebUI 放在根目录 `products/<product_name>/`。产品运行时不得 import explore，不得读取本目录的 `third_party/`、`.venv` 或依赖元数据。
+- `third_party/` 是该家族上游运行时的 vendor 副本，允许本模块内修改。官方更新后单独判断是否同步，不要自动覆盖。
 
 ## Environment
 
@@ -35,4 +38,4 @@
 - `demo` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
 - 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出。
 - 关键路径、模型名、任务名、输入文件、输出路径、采样率使用全局变量放在文件顶部。
-- 要体现 `from clearvoice import ClearVoice` 的真实使用方式，不把核心逻辑藏到包装层。
+- 要体现该模块公共入口的真实使用方式，不把核心逻辑藏到包装层。

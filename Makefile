@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 help: ## 显示帮助信息
-	@echo "LightClear 根目录只做路由。先 cd 到 explore/light_clearvoice 或 products/<name>。"
+	@echo "LightClear 根目录只做路由。先 cd 到 explore/light_* 或 products/<name>。"
 	@echo ""
 	@echo "Available commands:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
