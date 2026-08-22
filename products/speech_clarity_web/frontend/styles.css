@@ -550,6 +550,11 @@ td {
   font-weight: 700;
 }
 
+.tool-row label span,
+.tool-row label small {
+  display: block;
+}
+
 .tool-row small {
   color: var(--muted);
   font-size: 0.75rem;
@@ -588,6 +593,8 @@ td {
 }
 
 .artifact-card {
+  display: grid;
+  gap: 0.45rem;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface-muted);

@@ -320,14 +320,21 @@ function selectArtifact(ref, label, audioUrl, downloadUrl, path) {
   updateButtons();
 }
 
-function artifactButton(output, runId) {
+function artifactCard(output, runId) {
   const ref = `step:${runId}:${output.id}`;
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className = "artifact-card";
-  button.dataset.ref = ref;
+  const card = document.createElement("div");
+  card.className = "artifact-card";
+  card.dataset.ref = ref;
   const title = TOOL_LABELS[output.id] || output.id;
-  button.innerHTML = `<strong>${title}</strong>`;
+  const heading = document.createElement("button");
+  heading.type = "button";
+  heading.className = "secondary-button";
+  heading.textContent = `选中${title}`;
+  heading.addEventListener("click", () => {
+    selectArtifact(ref, title, output.audio_url, output.download_url, output.path);
+  });
+  const label = document.createElement("strong");
+  label.textContent = title;
   const audio = document.createElement("audio");
   audio.controls = true;
   audio.preload = "metadata";
@@ -337,14 +344,8 @@ function artifactButton(output, runId) {
   link.href = output.download_url;
   link.download = output.name || title;
   link.textContent = `下载${title}`;
-  button.append(audio, link);
-  button.addEventListener("click", (event) => {
-    if (event.target.closest("a, audio")) {
-      return;
-    }
-    selectArtifact(ref, title, output.audio_url, output.download_url, output.path);
-  });
-  return button;
+  card.append(label, audio, heading, link);
+  return card;
 }
 
 function renderSteps(task) {
@@ -359,18 +360,23 @@ function renderSteps(task) {
   }
   const inputCard = document.createElement("article");
   inputCard.className = "step-card";
-  inputCard.innerHTML = "<h3>原音频</h3>";
-  const inputButton = document.createElement("button");
-  inputButton.type = "button";
-  inputButton.className = "artifact-card";
-  inputButton.dataset.ref = "input";
-  inputButton.innerHTML = "<strong>原音频</strong>";
-  inputButton.addEventListener("click", () => {
+  inputCard.innerHTML = "<h3>导入</h3>";
+  const inputWrap = document.createElement("div");
+  inputWrap.className = "artifact-card";
+  inputWrap.dataset.ref = "input";
+  const inputLabel = document.createElement("strong");
+  inputLabel.textContent = "原音频";
+  const inputSelect = document.createElement("button");
+  inputSelect.type = "button";
+  inputSelect.className = "secondary-button";
+  inputSelect.textContent = "选中原音频";
+  inputSelect.addEventListener("click", () => {
     selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
   });
+  inputWrap.append(inputLabel, inputSelect);
   const inputGrid = document.createElement("div");
   inputGrid.className = "artifact-grid";
-  inputGrid.appendChild(inputButton);
+  inputGrid.appendChild(inputWrap);
   inputCard.appendChild(inputGrid);
   el.stepList.appendChild(inputCard);
 
@@ -385,7 +391,7 @@ function renderSteps(task) {
     const grid = document.createElement("div");
     grid.className = "artifact-grid";
     (step.outputs || []).forEach((output) => {
-      grid.appendChild(artifactButton(output, step.run_id));
+      grid.appendChild(artifactCard(output, step.run_id));
     });
     card.append(heading, meta, grid);
     el.stepList.appendChild(card);
