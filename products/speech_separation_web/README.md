@@ -23,3 +23,5 @@ uv pip install -e .
 - `GET /api/jobs/{job_id}/download/{speaker-1|speaker-2}`：下载分离音频。
 
 默认输出写入 `workspace/outputs/`，上传缓存写入 `workspace/uploads/`。
+
+语音多工具工作台见 `products/speech_clarity_web`。本入口仍是单工具说话人分离。

@@ -36,7 +36,7 @@
 - ClearVoice 中心模型目录：`/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重各放在使用方自己的 `models/<model>/`（explore 按模型分子目录；`vocal_isolate_web` 装 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`，默认 `htdemucs`），运行时互不读取。缺权重直接失败，不要回退家庭缓存。以后若有第二个产品要用，再单独做指向。
 - 允许在当前模块 `third_party/` 上做该家族需要的上游修改。官方更新后单独判断是否同步，不要自动覆盖，也不要改兄弟模块的副本。优先在 demo 或产品层适配。
 - 缺依赖、缺模型或路径错误应显式暴露直接错误，不要回退到旧根路径。
-- 不要添加共享 SDK 或把各产品 WebUI 合成全模型管理台。
+- 不要添加共享 SDK。产品按场景拆入口：同一场景可以有多件工具（`speech_clarity_web`）或同任务多档（`vocal_isolate_web`）。禁止跨场景引擎超市（ClearVoice + Demucs 同一目录页），禁止服务端万能管道，禁止把三个单工具 `speech_*_web` 合并成模型台。人声隔离不要接到任何 speech_* 产品。
 
 ## Demo 脚本规范
 

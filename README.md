@@ -18,6 +18,7 @@ LightClear/
 │   ├── light_clearvoice/           # ClearVoice 家族
 │   └── light_demucs/               # Demucs 家族
 ├── products/
+│   ├── speech_clarity_web/
 │   ├── speech_enhance_web/
 │   ├── speech_separation_web/
 │   ├── speech_super_resolution_web/
@@ -32,9 +33,10 @@ LightClear/
 | `explore/light_clearvoice/` | ClearVoice 运行时、demo、模型文档。 |
 | `explore/light_demucs/` | Demucs 运行时、demo、模型文档。vendor 在模块 `third_party/demucs`。 |
 | `assets/` | explore 共享样例；产品运行时不得读取。 |
-| `products/speech_enhance_web/` | 语音增强 WebUI，默认 `MossFormer2_SE_48K`。 |
-| `products/speech_separation_web/` | 说话人分离 WebUI，默认 `MossFormer2_SS_16K`。 |
-| `products/speech_super_resolution_web/` | 语音超分辨率 WebUI，默认 `MossFormer2_SR_48K`。 |
+| `products/speech_clarity_web/` | 语音清晰工作台：增强 / 分离 / 超分可独立调用，客户端按需串联。 |
+| `products/speech_enhance_web/` | 语音增强单工具 WebUI，默认 `MossFormer2_SE_48K`。 |
+| `products/speech_separation_web/` | 说话人分离单工具 WebUI，默认 `MossFormer2_SS_16K`。 |
+| `products/speech_super_resolution_web/` | 语音超分辨率单工具 WebUI，默认 `MossFormer2_SR_48K`。 |
 | `products/vocal_isolate_web/` | 人声隔离 WebUI，默认 `htdemucs`，可选 `htdemucs_ft` 与 `htdemucs_6s`。 |
 
 ## 探索模块
@@ -66,7 +68,7 @@ uv pip install -e .
 .venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 7860
 ```
 
-说话人分离、超分、人声隔离分别把目录换成 `speech_separation_web`、`speech_super_resolution_web` 或 `vocal_isolate_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。人声隔离不要接到 `speech_separation_web`。
+语音清晰工作台、说话人分离、超分、人声隔离分别把目录换成 `speech_clarity_web`、`speech_separation_web`、`speech_super_resolution_web` 或 `vocal_isolate_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。人声隔离不要接到任何 speech_* 产品。三个单工具 WebUI 仍然独立存在，不是把它们合并进工作台。
 
 ## 验证
 
@@ -79,7 +81,11 @@ cd ../light_demucs
 .venv/bin/python -c "from demucs.api import Separator; print(Separator.__name__)"
 .venv/bin/python -m tests.test_demucs_import
 
-cd ../../products/speech_enhance_web
+cd ../../products/speech_clarity_web
+.venv/bin/python -m tests.test_health
+.venv/bin/python -m tests.test_task_contract
+
+cd ../speech_enhance_web
 .venv/bin/python -m tests.test_health
 
 cd ../vocal_isolate_web

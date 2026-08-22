@@ -13,7 +13,9 @@
 - 产品运行时代码只从产品目录解析路径。
 - 产品不得读取任何 `explore/light_*` 的 `third_party/`、`.venv`、`demo/` 或依赖元数据。
 - 产品不得依赖仓库根 `assets/`；需要样例时拷进产品自己的 `assets/`。
-- 按任务拆分入口，不要做成跨任务的全模型管理台。同一任务内可以有质量档或输出档，例如 `vocal_isolate_web` 的 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`。人声隔离不要接到 `speech_separation_web`，也不要在该入口加 mdx 等其它 Demucs 袋。
+- 按场景拆入口。同一场景内可以有多件工具（`speech_clarity_web` 的增强 / 分离 / 超分），也可以有同任务质量档或输出档（`vocal_isolate_web` 的 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`）。
+- 三个单工具 `speech_enhance_web` / `speech_separation_web` / `speech_super_resolution_web` 继续合法存在，工作台不替换它们的 API。
+- 禁止跨场景引擎超市（ClearVoice 与 Demucs 同一目录页）。禁止服务端万能管道（不要 `POST /api/pipeline`）。人声隔离不要接到任何 speech_* 产品，也不要在该入口加 mdx 等其它 Demucs 袋。
 
 ## Environment
 

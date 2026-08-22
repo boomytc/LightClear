@@ -11,6 +11,7 @@ FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf", ".th", ".safetensors")
 SKIP_PARTS = {"third_party", ".venv", "__pycache__", ".git"}
 REQUIRED_EXPLORE = ("explore/light_clearvoice", "explore/light_demucs")
 REQUIRED_PRODUCTS = (
+    "products/speech_clarity_web",
     "products/speech_enhance_web",
     "products/speech_separation_web",
     "products/speech_super_resolution_web",
@@ -29,6 +30,8 @@ STALE_DOC_PHRASES = (
     "/Users/boom/Model/MSS",
     "scripts/install_htdemucs.py",
     "/Users/boom/workspace/demucs",
+    "把三个 speech WebUI 合成全模型管理台",
+    "按任务拆分入口，不要做成跨任务的全模型管理台",
 )
 
 
@@ -100,6 +103,13 @@ def main() -> None:
             fail(f"{relative} still documents install_htdemucs.py")
         if relative.endswith("faceDetector/s3fd/__init__.py") and "gdown" in text:
             fail(f"{relative} still downloads sfd_face.pth with gdown")
+        if relative.startswith("products/speech_clarity_web/") and (
+            "products.speech_enhance_web" in text
+            or "products.speech_separation_web" in text
+            or "products.speech_super_resolution_web" in text
+            or "products.vocal_isolate_web" in text
+        ):
+            fail(f"{relative} imports or references a sibling product package")
 
     for path in iter_tracked_files((".md",)):
         text = path.read_text(encoding="utf-8")
