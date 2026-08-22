@@ -5,7 +5,7 @@
 - 本文件只适用于 `products/vocal_isolate_web`。
 - 将本目录视为独立产品根目录。在本产品目录内编辑、运行、测试、安装；从仓库根进入则 `cd products/vocal_isolate_web`。
 - 任务 `vocal_isolation`。可选模型：`htdemucs`（默认四轨）、`htdemucs_ft`（同四轨质量档）、`htdemucs_6s`（六轨，含 guitar / piano）。
-- 一次推理得到人声 / 伴奏；四轨模型附带 drums / bass / other，六轨再附 guitar / piano。
+- 一次推理得到人声 / 伴奏；四轨模型附带 drums / bass / other，六轨再附 guitar / piano。任务始终是人声隔离，六轨不是第二个产品。
 - 这不是说话人分离。不要接到 `speech_separation_web`，不要 import explore。不要加 mdx 等其它 Demucs 袋。
 
 ## Environment

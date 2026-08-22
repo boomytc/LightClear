@@ -332,12 +332,17 @@ function applySelectedModel() {
   updateIsolateButton();
 }
 
+function pickModelName(models, preferredName) {
+  if (models.some((model) => model.name === preferredName && model.available)) {
+    return preferredName;
+  }
+  const firstAvailable = models.find((model) => model.available);
+  return firstAvailable?.name || preferredName || "htdemucs";
+}
+
 function renderModelOptions(models, preferredName) {
   state.models = models || [];
-  const preferred = state.models.some((model) => model.name === preferredName)
-    ? preferredName
-    : state.models[0]?.name || "htdemucs";
-  state.selectedModel = preferred;
+  state.selectedModel = pickModelName(state.models, preferredName);
   el.modelSelect.replaceChildren();
   state.models.forEach((model) => {
     const option = document.createElement("option");

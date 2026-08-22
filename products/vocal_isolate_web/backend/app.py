@@ -298,6 +298,7 @@ async def isolate(
             result.input_path,
             result.output_paths["vocals"],
             waveform_window,
+            stem_paths=result.output_paths,
         )
         record = store_job(result, analysis)
         return build_result_payload(record)

@@ -7,6 +7,8 @@ import re
 import sys
 import time
 
+import yaml
+
 
 AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 DEFAULT_MODEL = "htdemucs"
@@ -36,7 +38,7 @@ MODEL_SPECS = {
         "label": "htdemucs_6s 六轨",
         "outputs": SIX_STEM_OUTPUTS,
         "summary": "人声 / 伴奏 / 六轨",
-        "note": "另拆吉他和钢琴。人声仍取 vocals，伴奏为其余五轨相加。",
+        "note": "另拆吉他和钢琴。人声仍取 vocals，伴奏为其余五轨相加。当前示例上这两轨可能几乎听不见。",
     },
 }
 KNOWN_MODELS = tuple(MODEL_SPECS)
@@ -79,13 +81,20 @@ def model_checkpoint_dir(product_root: Path, model_name: str = DEFAULT_MODEL) ->
     return product_root / "models" / resolve_model_name(model_name)
 
 
+def expected_weight_files(repo: Path, model_name: str) -> list[Path]:
+    yaml_path = repo / f"{model_name}.yaml"
+    if not yaml_path.is_file():
+        return []
+    bag = yaml.safe_load(yaml_path.read_text(encoding="utf-8")) or {}
+    signatures = bag.get("models") or []
+    return [repo / f"{signature}.th" for signature in signatures]
+
+
 def model_is_available(product_root: Path, model_name: str = DEFAULT_MODEL) -> bool:
     name = resolve_model_name(model_name)
     repo = model_checkpoint_dir(product_root, name)
-    yaml_path = repo / f"{name}.yaml"
-    if not yaml_path.is_file():
-        return False
-    return any(path.suffix == ".th" for path in repo.glob("*.th"))
+    weight_files = expected_weight_files(repo, name)
+    return bool(weight_files) and all(path.is_file() for path in weight_files)
 
 
 def list_model_status(product_root: Path) -> list[dict[str, object]]:
@@ -188,8 +197,20 @@ def make_job_output_dir(output_dir: Path, input_path: Path, model_name: str) -> 
     return job_dir
 
 
-def accompaniment_from_stems(stems: dict[str, object]) -> object:
-    extras = [wave for name, wave in stems.items() if name != "vocals"]
+def native_stem_names(model_name: str) -> tuple[str, ...]:
+    return tuple(
+        name
+        for name in MODEL_SPECS[resolve_model_name(model_name)]["outputs"]
+        if name not in {"vocals", "accompaniment"}
+    )
+
+
+def accompaniment_from_stems(stems: dict[str, object], model_name: str) -> object:
+    extras = []
+    for name in native_stem_names(model_name):
+        if name not in stems:
+            raise FileNotFoundError(f"分轨结果缺少 {name}")
+        extras.append(stems[name])
     if not extras:
         raise ValueError("分轨结果缺少伴奏声部。")
     accompaniment = extras[0]
@@ -215,7 +236,7 @@ def isolate_audio_file(
 
     waves = {
         "vocals": stems["vocals"],
-        "accompaniment": accompaniment_from_stems(stems),
+        "accompaniment": accompaniment_from_stems(stems, model_handle.model_name),
     }
     for name in spec["outputs"]:
         if name in {"vocals", "accompaniment"}:

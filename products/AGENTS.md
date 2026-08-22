@@ -13,7 +13,7 @@
 - 产品运行时代码只从产品目录解析路径。
 - 产品不得读取任何 `explore/light_*` 的 `third_party/`、`.venv`、`demo/` 或依赖元数据。
 - 产品不得依赖仓库根 `assets/`；需要样例时拷进产品自己的 `assets/`。
-- 不要把新产品做成全模型管理台；按任务拆分入口。`vocal_isolate_web` 是人声隔离，不要接到 `speech_separation_web`。
+- 按任务拆分入口，不要做成跨任务的全模型管理台。同一任务内可以有质量档或输出档，例如 `vocal_isolate_web` 的 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`。人声隔离不要接到 `speech_separation_web`，也不要在该入口加 mdx 等其它 Demucs 袋。
 
 ## Environment
 

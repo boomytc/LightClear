@@ -104,11 +104,11 @@ def build_metrics_rows(
     enhanced_dr = metrics["enhanced_dynamic_range"]
     dr_improvement = enhanced_dr - original_dr
     dr_desc = (
-        "动态范围显著改善，音频层次更丰富"
+        "人声动态范围大于原曲"
         if dr_improvement > 2
-        else "动态范围略有改善，音质有所提升"
+        else "人声动态范围略大于原曲"
         if dr_improvement > 0
-        else "动态范围基本保持，处理较为保守"
+        else "人声动态范围与原曲接近"
     )
 
     snr_improvement = metrics["snr_improvement"]
@@ -117,31 +117,29 @@ def build_metrics_rows(
         if snr_improvement > 5
         else "人声与原曲有差异，隔离可见"
         if snr_improvement > 0
-        else "信噪比略有下降，可能过度处理"
-        if snr_improvement < -2
-        else "信噪比基本保持"
+        else "人声与原曲接近，隔离可能偏弱"
     )
 
     original_centroid = metrics["original_spectral_centroid"]
     enhanced_centroid = metrics["enhanced_spectral_centroid"]
     centroid_change = enhanced_centroid - original_centroid
     centroid_desc = (
-        "频谱质心上移，高频成分增强，清晰度提升"
+        "人声谱质心高于原曲"
         if centroid_change > 100
-        else "频谱质心略有上移，音质略有改善"
+        else "人声谱质心略高于原曲"
         if centroid_change > 0
-        else "频谱质心下移，高频成分减少，可能过度滤波"
+        else "人声谱质心低于原曲"
     )
 
     original_zcr = metrics["original_zcr"]
     enhanced_zcr = metrics["enhanced_zcr"]
     zcr_change = ((enhanced_zcr / (original_zcr + 1e-10)) - 1) * 100 if original_zcr > 0 else 0
     zcr_desc = (
-        "零交叉率显著降低，过零率下降，人声更干净"
+        "人声零交叉率明显低于原曲"
         if zcr_change < -30
-        else "零交叉率适度降低，人声峰值低于原曲，包络更收"
+        else "人声零交叉率低于原曲"
         if zcr_change < 0
-        else "零交叉率基本保持，信号特征稳定"
+        else "人声零交叉率与原曲接近"
     )
 
     return [
@@ -305,14 +303,38 @@ def figure_to_data_uri(fig) -> str:
     return f"data:image/png;base64,{encoded}"
 
 
+def build_stem_energy_rows(
+    stem_paths: dict[str, Path],
+    sample_rate: int,
+) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for name, path in stem_paths.items():
+        audio, _ = load_audio(path, sample_rate=sample_rate)
+        rms = float(np.sqrt(np.mean(audio**2)))
+        note = "能量极低，本段可能几乎听不见" if rms < 0.005 else "该声部相对幅度"
+        rows.append(
+            {
+                "指标类别": f"分轨 RMS · {name}",
+                "原曲": "-",
+                "人声": f"{rms:.4f}",
+                "变化量": "-",
+                "变化说明": note,
+            }
+        )
+    return rows
+
+
 def build_analysis_payload(
     original_path: Path,
     enhanced_path: Path,
     max_seconds: float,
+    stem_paths: dict[str, Path] | None = None,
 ) -> dict[str, object]:
     original_audio, sample_rate = load_audio(original_path)
     enhanced_audio, _ = load_audio(enhanced_path, sample_rate=sample_rate)
     metrics_rows = build_metrics_rows(original_audio, enhanced_audio, sample_rate)
+    if stem_paths:
+        metrics_rows.extend(build_stem_energy_rows(stem_paths, sample_rate))
 
     return {
         "sample_rate": sample_rate,

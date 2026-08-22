@@ -35,7 +35,7 @@ LightClear/
 | `products/speech_enhance_web/` | 语音增强 WebUI，默认 `MossFormer2_SE_48K`。 |
 | `products/speech_separation_web/` | 说话人分离 WebUI，默认 `MossFormer2_SS_16K`。 |
 | `products/speech_super_resolution_web/` | 语音超分辨率 WebUI，默认 `MossFormer2_SR_48K`。 |
-| `products/vocal_isolate_web/` | 人声隔离 WebUI，默认 `htdemucs`。 |
+| `products/vocal_isolate_web/` | 人声隔离 WebUI，默认 `htdemucs`，可选 `htdemucs_ft` 与 `htdemucs_6s`。 |
 
 ## 探索模块
 

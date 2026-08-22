@@ -18,7 +18,7 @@ uv pip install -e .
 
 ## 接口
 
-- `GET /api/health`：可选模型、示例数量和默认输出目录。
+- `GET /api/health`：默认模型、三档可选模型及各自是否就绪。`model_name` 与 `default_model` 都是默认档 `htdemucs`。
 - `GET /api/samples`：列出产品 `assets/` 下的示例音频。
 - `POST /api/isolate`：上传或选择示例，按 `model_name` 执行人声隔离。
 - `GET /api/jobs/{job_id}/audio/{original|vocals|accompaniment|drums|bass|other|guitar|piano}`：播放。六轨模型才有 guitar / piano。
