@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LightClear Speech Clarity Web</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230f766e'/%3E%3Cpath d='M14 40h8l6-16 8 24 6-16h8' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script src="/static/app.js" defer></script>
+  </head>
+  <body class="min-h-dvh bg-slate-50 text-slate-900">
+    <a class="skip-link" href="#main">跳到主内容</a>
+    <div class="app-shell">
+      <aside class="control-panel" aria-label="控制面板">
+        <div class="brand-block">
+          <p class="brand-kicker">LightClear</p>
+          <h1>Speech Clarity</h1>
+          <p class="brand-subtitle">语音清晰工作台</p>
+        </div>
+
+        <section class="panel-section" aria-labelledby="tools-heading">
+          <div class="section-title-row">
+            <h2 id="tools-heading">工具</h2>
+            <span id="sceneBadge" class="status-badge status-idle">检查中</span>
+          </div>
+          <p class="order-hint">默认顺序：分离 → 增强 → 超分。未勾选的跳过，不会一次全开。</p>
+          <div id="toolList" class="tool-list"></div>
+        </section>
+
+        <section class="panel-section" aria-labelledby="source-heading">
+          <h2 id="source-heading">音频来源</h2>
+          <div class="segmented-control" role="group" aria-label="音频来源">
+            <button id="sampleSourceButton" type="button" class="segment is-active" aria-pressed="true">示例文件</button>
+            <button id="uploadSourceButton" type="button" class="segment" aria-pressed="false">上传文件</button>
+          </div>
+          <div id="sampleControls" class="field-stack">
+            <label for="sampleSelect">示例音频</label>
+            <select id="sampleSelect"></select>
+          </div>
+          <div id="uploadControls" class="field-stack hidden">
+            <label for="uploadFile">上传音频</label>
+            <input id="uploadFile" type="file" />
+          </div>
+        </section>
+
+        <section class="panel-section" aria-labelledby="output-heading">
+          <h2 id="output-heading">分析窗口</h2>
+          <div class="field-stack">
+            <div class="label-row">
+              <label for="waveformSeconds">波形窗口</label>
+              <span id="waveformSecondsText">8 秒</span>
+            </div>
+            <input id="waveformSeconds" type="range" min="1" max="30" value="8" step="1" />
+          </div>
+        </section>
+
+        <div class="action-stack">
+          <button id="runButton" type="button" class="primary-button">
+            <span id="runButtonText">开始处理</span>
+            <span id="busySpinner" class="spinner hidden" aria-hidden="true"></span>
+          </button>
+          <button id="resetButton" type="button" class="secondary-button">清空结果</button>
+        </div>
+
+        <section class="panel-section" aria-labelledby="reprocess-heading">
+          <h2 id="reprocess-heading">对选中音频再处理</h2>
+          <p id="selectedArtifactLabel" class="order-hint">尚未选中产物</p>
+          <div class="field-stack">
+            <label for="reprocessTool">工具</label>
+            <select id="reprocessTool"></select>
+          </div>
+          <button id="reprocessButton" type="button" class="secondary-button">再处理选中音频</button>
+        </section>
+        <p id="statusMessage" class="status-message" role="status" aria-live="polite"></p>
+      </aside>
+
+      <main id="main" class="workspace" tabindex="-1">
+        <header class="workspace-header">
+          <div>
+            <p class="eyebrow">Speech Clarity</p>
+            <h2>语音清晰工作台</h2>
+          </div>
+          <div id="resultStamp" class="result-stamp">等待处理</div>
+        </header>
+
+        <section class="audio-grid" aria-label="当前对照">
+          <article class="audio-panel">
+            <div class="panel-heading">
+              <h3>输入</h3>
+              <span id="inputName" class="file-chip">未选择</span>
+            </div>
+            <audio id="originalAudio" controls preload="metadata"></audio>
+            <p id="inputPath" class="path-text">-</p>
+          </article>
+          <article class="audio-panel">
+            <div class="panel-heading">
+              <h3>当前结果</h3>
+              <span id="outputName" class="file-chip muted">无结果</span>
+            </div>
+            <audio id="resultAudio" controls preload="metadata"></audio>
+            <p id="outputPath" class="path-text">-</p>
+            <a id="downloadLink" class="download-link is-disabled" href="#" aria-disabled="true">下载当前结果</a>
+          </article>
+        </section>
+
+        <section class="analysis-shell" aria-labelledby="steps-heading">
+          <div class="analysis-heading-row">
+            <h3 id="steps-heading">处理步骤</h3>
+          </div>
+          <div id="stepList" class="step-list">
+            <p class="empty-state">尚未开始。勾选工具后点开始处理；之后可对某一步产物再跑另一件工具。</p>
+          </div>
+        </section>
+
+        <section class="metric-grid" aria-label="时间统计">
+          <div class="metric-tile">
+            <span>模型首次加载</span>
+            <strong id="initialLoadMetric">-</strong>
+          </div>
+          <div class="metric-tile">
+            <span>本次模型准备</span>
+            <strong id="readyMetric">-</strong>
+          </div>
+          <div class="metric-tile">
+            <span>音频处理</span>
+            <strong id="processMetric">-</strong>
+          </div>
+          <div class="metric-tile">
+            <span>总执行</span>
+            <strong id="totalMetric">-</strong>
+          </div>
+        </section>
+
+        <section class="analysis-shell" aria-labelledby="analysis-heading">
+          <div class="analysis-heading-row">
+            <h3 id="analysis-heading">对比分析</h3>
+            <div class="tabs" role="tablist" aria-label="分析视图">
+              <button id="waveformTab" type="button" class="tab-button is-active" role="tab" aria-selected="true" data-tab="waveform">波形</button>
+              <button id="spectrumTab" type="button" class="tab-button" role="tab" aria-selected="false" data-tab="spectrum">频谱</button>
+              <button id="metricsTab" type="button" class="tab-button" role="tab" aria-selected="false" data-tab="metrics">指标</button>
+            </div>
+          </div>
+          <div id="waveformPanel" class="tab-panel" role="tabpanel" aria-labelledby="waveformTab">
+            <img id="waveformImage" alt="输入与输出波形对比" />
+            <p class="empty-state">等待分析结果</p>
+          </div>
+          <div id="spectrumPanel" class="tab-panel hidden" role="tabpanel" aria-labelledby="spectrumTab">
+            <div class="spectrum-grid">
+              <img id="powerSpectrumImage" alt="功率谱对比" />
+              <img id="melSpectrumImage" alt="Mel 频谱对比" />
+            </div>
+            <p class="empty-state">等待分析结果</p>
+          </div>
+          <div id="metricsPanel" class="tab-panel hidden" role="tabpanel" aria-labelledby="metricsTab">
+            <div class="table-wrap">
+              <table id="metricsTable">
+                <thead></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <p class="empty-state">等待分析结果</p>
+          </div>
+        </section>
+
+        <section class="log-panel" aria-labelledby="log-heading">
+          <div class="panel-heading">
+            <h3 id="log-heading">处理日志</h3>
+            <span id="logCount" class="file-chip muted">0</span>
+          </div>
+          <ol id="logList" class="log-list"></ol>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
