@@ -8,7 +8,7 @@
 | 模块 | 上游家族 | 学什么 | 产品可抄形状 | 不要当 |
 |------|----------|--------|--------------|--------|
 | [`light_clearvoice/`](./light_clearvoice/) | ClearVoice | SE / SS / SR / TSE 加载与推理 | 三个 `speech_*_web` 产品自持一份 ClearVoice | Demucs 运行时、全模型管理台 |
-| [`light_demucs/`](./light_demucs/) | Demucs | 人声隔离、四轨、`htdemucs_ft` 质量档、六轨；`Separator` API | `vocal_isolate_web` 自持一份 Demucs，目前只产品化默认四轨 | ClearVoice 说话人分离、`speech_separation_web` |
+| [`light_demucs/`](./light_demucs/) | Demucs | 人声隔离、四轨、`htdemucs_ft` 质量档、六轨；`Separator` API | `vocal_isolate_web` 自持一份 Demucs，默认四轨，可选质量档与六轨 | ClearVoice 说话人分离、`speech_separation_web` |
 
 新上游家族开新的 `light_*`，不要按任务拆 ClearVoice，也不要折进兄弟目录。
 
@@ -19,7 +19,7 @@
 | `products/speech_enhance_web` | `light_clearvoice` | 产品自持 ClearVoice；不得 import explore |
 | `products/speech_separation_web` | `light_clearvoice` | 说话人分离，不是 Demucs 分轨 |
 | `products/speech_super_resolution_web` | `light_clearvoice` | 同上 |
-| `products/vocal_isolate_web` | `light_demucs` 的 `htdemucs` | 人声隔离 / 四轨；`htdemucs_ft` 与六轨仍在 explore，不得 import explore |
+| `products/vocal_isolate_web` | `light_demucs` 的 `htdemucs` / `htdemucs_ft` / `htdemucs_6s` | 人声隔离；默认四轨，可选质量档与六轨。不得 import explore |
 
 ## 从哪进
 

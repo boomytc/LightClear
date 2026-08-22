@@ -4,7 +4,7 @@
 
 `htdemucs` 的按声部微调袋。输出仍是 vocals / drums / bass / other，不是新任务。四个专家模型各负责一轨，推理跑四次再按权重拼回，官方大约 4 倍耗时、MUSDB HQ SDR 约 9.20 dB（单模型 `htdemucs` 约 9.00 dB）。
 
-产品若要更高质量的人声隔离，抄本档的加载与输出形状，不要改 `vocal_isolate_web` 的任务语义。
+`vocal_isolate_web` 已把本档作为可选质量档接入，任务仍是 `vocal_isolation`。
 
 ## 下载来源
 

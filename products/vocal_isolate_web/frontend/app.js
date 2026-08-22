@@ -1,6 +1,8 @@
 const state = {
   source: "sample",
   samples: [],
+  models: [],
+  selectedModel: "htdemucs",
   busy: false,
   modelAvailable: false,
   activeTab: "waveform",
@@ -16,6 +18,8 @@ function byId(id) {
 function bindElements() {
   [
     "modelBadge",
+    "modelSelect",
+    "modelNote",
     "modelName",
     "checkpointPath",
     "sampleCount",
@@ -104,10 +108,18 @@ function sampleAudioUrl(path) {
   return `/api/sample-audio?path=${encodeURIComponent(path)}`;
 }
 
+function selectedModelSpec() {
+  return state.models.find((model) => model.name === state.selectedModel) || null;
+}
+
+function selectedModelAvailable() {
+  return Boolean(selectedModelSpec()?.available);
+}
+
 function updateIsolateButton() {
   const hasSample = state.source === "sample" && Boolean(selectedSample());
   const hasUpload = state.source === "upload" && el.uploadFile.files.length > 0;
-  el.isolateButton.disabled = state.busy || !state.modelAvailable || !(hasSample || hasUpload);
+  el.isolateButton.disabled = state.busy || !selectedModelAvailable() || !(hasSample || hasUpload);
 }
 
 function setBusy(isBusy) {
@@ -115,6 +127,7 @@ function setBusy(isBusy) {
   el.isolateButtonText.textContent = isBusy ? "处理中" : "开始隔离";
   el.busySpinner.classList.toggle("hidden", !isBusy);
   el.sampleSelect.disabled = isBusy;
+  el.modelSelect.disabled = isBusy;
   el.uploadFile.disabled = isBusy;
   el.outputDir.disabled = isBusy;
   el.waveformSeconds.disabled = isBusy;
@@ -299,22 +312,49 @@ function activateTab(tabName) {
   });
 }
 
+function applySelectedModel() {
+  const spec = selectedModelSpec();
+  state.modelAvailable = Boolean(spec?.available);
+  el.modelName.textContent = spec?.name || state.selectedModel;
+  el.checkpointPath.textContent = spec?.checkpoint_dir || "-";
+  el.modelNote.textContent = spec?.note || "";
+
+  if (!spec) {
+    setBadge("status-missing", "模型未知");
+    setStatus("未找到所选模型", true);
+  } else if (spec.available) {
+    setBadge("status-ready", "模型就绪");
+    setStatus("");
+  } else {
+    setBadge("status-missing", "模型未就绪");
+    setStatus(`产品模型目录未就绪，先安装到 ${spec.checkpoint_dir}`, true);
+  }
+  updateIsolateButton();
+}
+
+function renderModelOptions(models, preferredName) {
+  state.models = models || [];
+  const preferred = state.models.some((model) => model.name === preferredName)
+    ? preferredName
+    : state.models[0]?.name || "htdemucs";
+  state.selectedModel = preferred;
+  el.modelSelect.replaceChildren();
+  state.models.forEach((model) => {
+    const option = document.createElement("option");
+    option.value = model.name;
+    option.textContent = model.available ? model.label : `${model.label}（未就绪）`;
+    el.modelSelect.appendChild(option);
+  });
+  el.modelSelect.value = state.selectedModel;
+  applySelectedModel();
+}
+
 async function loadHealth() {
   const health = await apiJson("/api/health");
-  state.modelAvailable = Boolean(health.model_available);
-  el.modelName.textContent = health.model_name;
-  el.checkpointPath.textContent = health.checkpoint_dir;
   el.sampleCount.textContent = String(health.sample_count);
   el.uploadFile.accept = health.supported_extensions.map((extension) => `.${extension}`).join(",");
   el.outputDir.value = health.default_output_dir;
-
-  if (state.modelAvailable) {
-    setBadge("status-ready", "模型就绪");
-  } else {
-    setBadge("status-missing", "模型未就绪");
-    setStatus("产品模型目录未就绪，先安装到 models/htdemucs", true);
-  }
-  updateIsolateButton();
+  renderModelOptions(health.models, health.default_model || health.model_name || "htdemucs");
 }
 
 async function loadSamples() {
@@ -344,6 +384,7 @@ async function runIsolation() {
   resetResult(false);
   const formData = new FormData();
   formData.append("source_type", state.source);
+  formData.append("model_name", state.selectedModel);
   formData.append("output_dir", el.outputDir.value);
   formData.append("waveform_seconds", el.waveformSeconds.value);
 
@@ -354,7 +395,7 @@ async function runIsolation() {
       return;
     }
     formData.append("sample_path", sample.path);
-    appendLog(`开始隔离: ${sample.path}`);
+    appendLog(`开始隔离 (${state.selectedModel}): ${sample.path}`);
   } else {
     const file = el.uploadFile.files[0];
     if (!file) {
@@ -362,7 +403,7 @@ async function runIsolation() {
       return;
     }
     formData.append("file", file);
-    appendLog(`开始隔离: ${file.name}`);
+    appendLog(`开始隔离 (${state.selectedModel}): ${file.name}`);
   }
 
   setBusy(true);
@@ -376,7 +417,6 @@ async function runIsolation() {
     });
     renderResult(data);
     setBadge("status-ready", "模型就绪");
-    state.modelAvailable = true;
   } catch (error) {
     appendLog(`处理失败: ${error.message}`);
     setStatus(error.message, true);
@@ -387,6 +427,11 @@ async function runIsolation() {
 }
 
 function bindEvents() {
+  el.modelSelect.addEventListener("change", () => {
+    state.selectedModel = el.modelSelect.value;
+    resetResult(false);
+    applySelectedModel();
+  });
   el.sampleSourceButton.addEventListener("click", () => setSource("sample"));
   el.uploadSourceButton.addEventListener("click", () => setSource("upload"));
   el.sampleSelect.addEventListener("change", () => {

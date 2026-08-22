@@ -14,6 +14,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from fastapi.testclient import TestClient
 
 from backend.app import app
+from backend.runtime import DEFAULT_MODEL, KNOWN_MODELS
 
 
 def load_health() -> dict[str, object]:
@@ -26,8 +27,15 @@ def load_health() -> dict[str, object]:
         raise AssertionError(f"unexpected app id: {payload}")
     if payload.get("task") != "vocal_isolation":
         raise AssertionError(f"unexpected task: {payload}")
-    if payload.get("model_name") != "htdemucs":
-        raise AssertionError(f"unexpected model: {payload}")
+    if payload.get("default_model") != DEFAULT_MODEL:
+        raise AssertionError(f"unexpected default model: {payload}")
+    models = payload.get("models")
+    if not isinstance(models, list):
+        raise AssertionError(f"models must be a list: {payload}")
+    names = [item.get("name") for item in models]
+    missing = [name for name in KNOWN_MODELS if name not in names]
+    if missing:
+        raise AssertionError(f"health missing models {missing}: {payload}")
     sample_count = payload.get("sample_count")
     if not isinstance(sample_count, int) or sample_count < 1:
         raise AssertionError(f"sample_count must be >= 1: {payload}")

@@ -22,7 +22,7 @@
 - 权重目录：本模块 `models/<model>/`，不进版本库。安装：`.venv/bin/python scripts/install_model.py <htdemucs|htdemucs_ft|htdemucs_6s>`。缺目录直接失败。不要写家庭缓存，不要安装时自动拷进产品。产品要权重时自己指定模型名和目标目录再装一份。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。
-- 稳定产品入口是 `../../products/vocal_isolate_web/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。
+- 稳定产品入口是 `../../products/vocal_isolate_web/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。产品可选 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`，默认仍是 `htdemucs`。
 
 ## Runtime Rules
 

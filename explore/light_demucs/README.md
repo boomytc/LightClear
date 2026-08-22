@@ -14,7 +14,7 @@ from demucs.api import Separator
 .venv/bin/python scripts/install_model.py htdemucs_6s
 ```
 
-产品要单独装到它自己的 `models/<model>`，不要运行时读取本目录。`vocal_isolate_web` 目前只装 `htdemucs`。
+产品要单独装到它自己的 `models/<model>`，不要运行时读取本目录。`vocal_isolate_web` 可装 `htdemucs`、`htdemucs_ft`、`htdemucs_6s`，默认仍是 `htdemucs`。
 
 ## 安装
 

@@ -13,17 +13,19 @@ from fastapi.staticfiles import StaticFiles
 from .analysis import build_analysis_payload
 from .runtime import (
     AUDIO_EXTENSIONS,
+    DEFAULT_MODEL,
     DEFAULT_OUTPUT_DIR,
     IsolationResult,
-    MODEL_NAME,
-    STEM_NAMES,
+    MODEL_SPECS,
     TASK_NAME,
     audio_mime_type,
     isolate_audio_file,
+    list_model_status,
     list_sample_audio,
-    load_htdemucs,
+    load_separator,
     model_checkpoint_dir,
     model_is_available,
+    resolve_model_name,
     resolve_project_output_dir,
     safe_filename,
     write_uploaded_audio_bytes,
@@ -41,6 +43,8 @@ STEM_LABELS = {
     "drums": "鼓",
     "bass": "贝斯",
     "other": "其它",
+    "guitar": "吉他",
+    "piano": "钢琴",
 }
 
 
@@ -57,7 +61,7 @@ class JobRecord:
 app = FastAPI(title="LightClear Vocal Isolate Web", version="1.0.0")
 app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
-_model_handle = None
+_model_handles: dict[str, object] = {}
 _model_lock = threading.Lock()
 _inference_lock = threading.Lock()
 _jobs: dict[str, JobRecord] = {}
@@ -72,12 +76,13 @@ def project_relative(path: Path) -> str:
         return str(resolved_path)
 
 
-def get_model_handle():
-    global _model_handle
+def get_model_handle(model_name: str):
     with _model_lock:
-        if _model_handle is None:
-            _model_handle = load_htdemucs(PRODUCT_ROOT)
-        return _model_handle
+        handle = _model_handles.get(model_name)
+        if handle is None:
+            handle = load_separator(PRODUCT_ROOT, model_name)
+            _model_handles[model_name] = handle
+        return handle
 
 
 def resolve_sample_path(sample_path: str | None) -> Path:
@@ -128,6 +133,7 @@ def resolve_stem(record: JobRecord, variant: str) -> Path:
 
 
 def output_payloads(record: JobRecord) -> list[dict[str, object]]:
+    names = MODEL_SPECS[record.result.model_name]["outputs"]
     return [
         {
             "id": name,
@@ -137,20 +143,22 @@ def output_payloads(record: JobRecord) -> list[dict[str, object]]:
             "audio_url": f"/api/jobs/{record.job_id}/audio/{name}",
             "download_url": f"/api/jobs/{record.job_id}/download/{name}",
         }
-        for name in STEM_NAMES
+        for name in names
         if name in record.output_paths
     ]
 
 
 def build_result_payload(record: JobRecord) -> dict[str, object]:
     result = record.result
+    spec = MODEL_SPECS[result.model_name]
     outputs = output_payloads(record)
     vocals = next(item for item in outputs if item["id"] == "vocals")
     return {
         "job_id": record.job_id,
         "created_at": record.created_at,
+        "model_name": result.model_name,
         "input_name": result.input_path.name,
-        "output_name": "人声 / 伴奏 / 四轨",
+        "output_name": spec["summary"],
         "input_path": project_relative(result.input_path),
         "output_path": vocals["path"],
         "input_audio_url": f"/api/jobs/{record.job_id}/audio/original",
@@ -165,6 +173,7 @@ def build_result_payload(record: JobRecord) -> dict[str, object]:
         },
         "analysis": record.analysis,
         "logs": [
+            f"模型: {result.model_name}",
             f"输入: {project_relative(result.input_path)}",
             *[f"{item['label']}: {item['path']}" for item in outputs],
             f"模型准备: {result.model_ready_seconds:.2f} 秒",
@@ -186,14 +195,18 @@ def favicon() -> Response:
 
 @app.get("/api/health")
 def health() -> dict[str, object]:
-    checkpoint_dir = model_checkpoint_dir(PRODUCT_ROOT)
+    models = list_model_status(PRODUCT_ROOT)
     samples = list_sample_audio(PRODUCT_ROOT)
+    default_available = model_is_available(PRODUCT_ROOT, DEFAULT_MODEL)
     return {
         "app": "vocal_isolate_web",
-        "model_name": MODEL_NAME,
+        "model_name": DEFAULT_MODEL,
+        "default_model": DEFAULT_MODEL,
         "task": TASK_NAME,
-        "model_available": model_is_available(PRODUCT_ROOT),
-        "checkpoint_dir": project_relative(checkpoint_dir),
+        "model_available": default_available,
+        "any_model_available": any(bool(item["available"]) for item in models),
+        "checkpoint_dir": project_relative(model_checkpoint_dir(PRODUCT_ROOT, DEFAULT_MODEL)),
+        "models": models,
         "sample_count": len(samples),
         "default_output_dir": DEFAULT_OUTPUT_DIR,
         "upload_dir": project_relative(UPLOAD_DIR),
@@ -224,12 +237,18 @@ def sample_audio(path: str) -> FileResponse:
 async def isolate(
     source_type: str = Form(...),
     sample_path: str | None = Form(default=None),
+    model_name: str = Form(default=DEFAULT_MODEL),
     output_dir: str = Form(default=DEFAULT_OUTPUT_DIR),
     waveform_seconds: float = Form(default=8.0),
     file: UploadFile | None = File(default=None),
 ) -> dict[str, object]:
     total_start = time.perf_counter()
     source = source_type.strip().lower()
+
+    try:
+        selected_model = resolve_model_name(model_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     if source == "sample":
         input_path = resolve_sample_path(sample_path)
@@ -255,15 +274,15 @@ async def isolate(
 
     waveform_window = max(1.0, min(float(waveform_seconds), 30.0))
 
-    if not model_is_available(PRODUCT_ROOT):
+    if not model_is_available(PRODUCT_ROOT, selected_model):
         raise HTTPException(
             status_code=503,
-            detail=f"产品模型目录未就绪: {model_checkpoint_dir(PRODUCT_ROOT)}",
+            detail=f"产品模型目录未就绪: {model_checkpoint_dir(PRODUCT_ROOT, selected_model)}",
         )
 
     try:
         model_ready_start = time.perf_counter()
-        model_handle = get_model_handle()
+        model_handle = get_model_handle(selected_model)
         model_ready_seconds = time.perf_counter() - model_ready_start
 
         with _inference_lock:
@@ -282,6 +301,8 @@ async def isolate(
         )
         record = store_job(result, analysis)
         return build_result_payload(record)
+    except HTTPException:
+        raise
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"处理失败: {exc}") from exc
 

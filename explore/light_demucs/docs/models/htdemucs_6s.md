@@ -4,7 +4,7 @@
 
 实验六轨模型。在四轨之外再拆 `guitar` 与 `piano`。权重里的声部顺序是 drums / bass / other / vocals / guitar / piano。官方说明吉他尚可，钢琴串音和伪影多。
 
-这是乐器分轨能力，不是更好的人声隔离。人声仍取 `vocals`；伴奏是其余五轨相加。不要接到 `vocal_isolate_web` 的默认四轨合同。
+这是乐器分轨能力，不是更好的人声隔离。人声仍取 `vocals`；伴奏是其余五轨相加。`vocal_isolate_web` 把它作为可选六轨，默认仍是四轨 `htdemucs`。
 
 ## 下载来源
 
