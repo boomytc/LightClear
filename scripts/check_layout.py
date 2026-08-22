@@ -32,6 +32,7 @@ STALE_DOC_PHRASES = (
     "/Users/boom/workspace/demucs",
     "把三个 speech WebUI 合成全模型管理台",
     "按任务拆分入口，不要做成跨任务的全模型管理台",
+    "前端尚未接入",
 )
 
 

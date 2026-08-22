@@ -68,7 +68,7 @@ uv pip install -e .
 .venv/bin/uvicorn backend.app:app --host 127.0.0.1 --port 7860
 ```
 
-语音清晰工作台、说话人分离、超分、人声隔离分别把目录换成 `speech_clarity_web`、`speech_separation_web`、`speech_super_resolution_web` 或 `vocal_isolate_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。人声隔离不要接到任何 speech_* 产品。三个单工具 WebUI 仍然独立存在，不是把它们合并进工作台。
+其他产品把目录换成 `speech_clarity_web`、`speech_separation_web`、`speech_super_resolution_web` 或 `vocal_isolate_web`。不要从仓库根安装，也不要用 `products.<name>` 作为 uvicorn 目标。人声隔离不要接到任何 speech_* 产品。三个单工具 WebUI 仍然独立存在，不是把它们合并进工作台。
 
 ## 验证
 

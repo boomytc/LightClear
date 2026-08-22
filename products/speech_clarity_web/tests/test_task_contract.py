@@ -55,6 +55,13 @@ def main() -> None:
     task = _create_task(client, "assets/noisy_input.wav")
     task_id = str(task["task_id"])
     report["task_id"] = task_id
+    listed = client.get("/api/tasks")
+    if listed.status_code != 200:
+        raise AssertionError(f"list tasks {listed.status_code}: {listed.text}")
+    ids = [item.get("task_id") for item in listed.json().get("tasks", [])]
+    if task_id not in ids:
+        raise AssertionError(f"created task missing from list: {ids}")
+    report["listed"] = True
 
     unknown = _run(client, task_id, "mdx", "input")
     if unknown.status_code != 400:
@@ -89,6 +96,16 @@ def main() -> None:
             raise AssertionError(f"enhance audio {audio.status_code}")
         report["enhance_run"] = body["run_id"]
         report["enhance_process_seconds"] = body["timing"]["process_seconds"]
+        replay = client.get(f"/api/tasks/{task_id}/runs/{body['run_id']}")
+        if replay.status_code != 200:
+            raise AssertionError(f"get run {replay.status_code}: {replay.text}")
+        replay_analysis = replay.json().get("analysis") or {}
+        if replay_analysis.get("input_sample_rate") is None or replay_analysis.get("output_sample_rate") is None:
+            raise AssertionError(f"run analysis missing sample rates: {replay_analysis}")
+        report["enhance_replay_sr"] = [
+            replay_analysis.get("input_sample_rate"),
+            replay_analysis.get("output_sample_rate"),
+        ]
 
     if available["separate"]:
         mix_task = _create_task(client, "assets/mixture_input.wav")

@@ -104,29 +104,46 @@ def _plot_mel_spectrum(series: list[tuple[str, np.ndarray, int]]):
     return fig
 
 
-def _enhance_rows(input_audio: np.ndarray, output_audio: np.ndarray, sample_rate: int) -> list[dict[str, str]]:
-    min_len = min(len(input_audio), len(output_audio))
-    original = input_audio[:min_len]
-    enhanced = output_audio[:min_len]
-    residual = original - enhanced
-    residual_power = float(np.mean(residual**2))
-    signal_power = float(np.mean(enhanced**2))
-    residual_ratio_db = 0.0 if residual_power == 0 else float(10 * np.log10(signal_power / residual_power))
+def _enhance_rows(
+    input_audio: np.ndarray,
+    output_audio: np.ndarray,
+    input_sr: int,
+    output_sr: int,
+) -> list[dict[str, str]]:
+    same_rate = input_sr == output_sr
+    if same_rate:
+        min_len = min(len(input_audio), len(output_audio))
+        original = input_audio[:min_len]
+        enhanced = output_audio[:min_len]
+        residual = original - enhanced
+        residual_power = float(np.mean(residual**2))
+        signal_power = float(np.mean(enhanced**2))
+        residual_ratio_db = 0.0 if residual_power == 0 else float(10 * np.log10(signal_power / residual_power))
+        sr_note = "输入与输出采样率相同"
+        duration_note = "按时长截齐后对比"
+        residual_note = "输入减输出的残差相对输出能量，数值越大差异越明显"
+    else:
+        original = input_audio
+        enhanced = output_audio
+        residual_ratio_db = 0.0
+        sr_note = f"输出 {output_sr} Hz 与输入 {input_sr} Hz 不同，残差不对齐"
+        duration_note = "按各自原生采样率计算"
+        residual_note = "采样率不同，不计算残差"
     input_rms = _rms(original)
     output_rms = _rms(enhanced)
     rms_change = ((output_rms / (input_rms + 1e-10)) - 1) * 100 if input_rms > 0 else 0.0
     return [
         {
             "指标类别": "采样率 (Hz)",
-            "输入": str(sample_rate),
-            "输出": str(sample_rate),
-            "说明": "增强不改变采样率合同",
+            "输入": str(input_sr),
+            "输出": str(output_sr),
+            "说明": sr_note,
         },
         {
             "指标类别": "时长 (秒)",
-            "输入": f"{min_len / sample_rate:.2f}",
-            "输出": f"{min_len / sample_rate:.2f}",
-            "说明": "按时长截齐后对比",
+            "输入": f"{len(input_audio) / input_sr:.2f}",
+            "输出": f"{len(output_audio) / output_sr:.2f}",
+            "说明": duration_note,
         },
         {
             "指标类别": "RMS",
@@ -143,13 +160,13 @@ def _enhance_rows(input_audio: np.ndarray, output_audio: np.ndarray, sample_rate
         {
             "指标类别": "残差比 (dB)",
             "输入": "-",
-            "输出": f"{residual_ratio_db:.2f}",
-            "说明": "输入减输出的残差相对输出能量，数值越大差异越明显",
+            "输出": "-" if not same_rate else f"{residual_ratio_db:.2f}",
+            "说明": residual_note,
         },
         {
             "指标类别": "谱质心 (Hz)",
-            "输入": f"{_centroid(original, sample_rate):.1f}",
-            "输出": f"{_centroid(enhanced, sample_rate):.1f}",
+            "输入": f"{_centroid(input_audio, input_sr):.1f}",
+            "输出": f"{_centroid(output_audio, output_sr):.1f}",
             "说明": "仅描述频谱重心，不当作带宽扩展",
         },
     ]
@@ -159,26 +176,29 @@ def _separate_rows(
     mix: np.ndarray,
     speaker_1: np.ndarray,
     speaker_2: np.ndarray,
-    sample_rate: int,
+    mix_sr: int,
+    speaker_1_sr: int,
+    speaker_2_sr: int,
 ) -> list[dict[str, str]]:
-    duration = min(len(mix), len(speaker_1), len(speaker_2)) / sample_rate
     mix_rms = _rms(mix)
     s1_rms = _rms(speaker_1)
     s2_rms = _rms(speaker_2)
+    same_rate = mix_sr == speaker_1_sr == speaker_2_sr
+    sr_note = "三路采样率相同" if same_rate else "按各路原生采样率记录，不假装已经对齐"
     return [
         {
             "指标类别": "采样率 (Hz)",
-            "混合": str(sample_rate),
-            "说话人 1": str(sample_rate),
-            "说话人 2": str(sample_rate),
-            "说明": "分离不改变采样率合同",
+            "混合": str(mix_sr),
+            "说话人 1": str(speaker_1_sr),
+            "说话人 2": str(speaker_2_sr),
+            "说明": sr_note,
         },
         {
             "指标类别": "时长 (秒)",
-            "混合": f"{duration:.2f}",
-            "说话人 1": f"{len(speaker_1) / sample_rate:.2f}",
-            "说话人 2": f"{len(speaker_2) / sample_rate:.2f}",
-            "说明": "两路与混合对齐播放",
+            "混合": f"{len(mix) / mix_sr:.2f}",
+            "说话人 1": f"{len(speaker_1) / speaker_1_sr:.2f}",
+            "说话人 2": f"{len(speaker_2) / speaker_2_sr:.2f}",
+            "说明": "按各自原生采样率计算",
         },
         {
             "指标类别": "RMS",
@@ -196,9 +216,9 @@ def _separate_rows(
         },
         {
             "指标类别": "谱质心 (Hz)",
-            "混合": f"{_centroid(mix, sample_rate):.1f}",
-            "说话人 1": f"{_centroid(speaker_1, sample_rate):.1f}",
-            "说话人 2": f"{_centroid(speaker_2, sample_rate):.1f}",
+            "混合": f"{_centroid(mix, mix_sr):.1f}",
+            "说话人 1": f"{_centroid(speaker_1, speaker_1_sr):.1f}",
+            "说话人 2": f"{_centroid(speaker_2, speaker_2_sr):.1f}",
             "说明": "描述各路频谱重心",
         },
     ]
@@ -277,7 +297,9 @@ def build_analysis_payload(
             "input_sample_rate": input_sr,
             "output_sample_rate": speaker_1_sr,
             "duration_seconds": len(input_audio) / input_sr,
-            "metrics_rows": _separate_rows(input_audio, speaker_1, speaker_2, input_sr),
+            "metrics_rows": _separate_rows(
+                input_audio, speaker_1, speaker_2, input_sr, speaker_1_sr, speaker_2_sr
+            ),
             "waveform_image": figure_to_data_uri(_plot_waveforms(series, max_seconds)),
             "power_spectrum_image": figure_to_data_uri(_plot_power_spectrum(series)),
             "mel_spectrum_image": figure_to_data_uri(
@@ -292,7 +314,7 @@ def build_analysis_payload(
         rows = _super_resolve_rows(input_audio, output_audio, input_sr, output_sr)
     else:
         output_title = "增强音频"
-        rows = _enhance_rows(input_audio, output_audio, input_sr)
+        rows = _enhance_rows(input_audio, output_audio, input_sr, output_sr)
     series = [
         ("输入音频", input_audio, input_sr, "#2563eb"),
         (output_title, output_audio, output_sr, "#0f766e"),

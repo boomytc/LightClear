@@ -46,6 +46,8 @@ function bindElements() {
     "busySpinner",
     "resetButton",
     "selectedArtifactLabel",
+    "taskSelect",
+    "openTaskButton",
     "reprocessTool",
     "reprocessButton",
     "statusMessage",
@@ -132,6 +134,9 @@ function updateButtons() {
   el.runButton.disabled = state.busy || !hasSource || !hasTools;
   const reprocessReady = Boolean(state.task) && Boolean(el.reprocessTool.value);
   el.reprocessButton.disabled = state.busy || !reprocessReady;
+  if (el.openTaskButton) {
+    el.openTaskButton.disabled = state.busy || !el.taskSelect.value;
+  }
 }
 
 function setBusy(isBusy, label) {
@@ -298,7 +303,7 @@ function renderTiming(timing) {
   el.totalMetric.textContent = formatSeconds(timing?.total_seconds);
 }
 
-function selectArtifact(ref, label, audioUrl, downloadUrl, path) {
+async function selectArtifact(ref, label, audioUrl, downloadUrl, path, options = {}) {
   state.selectedRef = ref;
   state.selectedLabel = label;
   el.selectedArtifactLabel.textContent = `当前选中：${label}`;
@@ -313,11 +318,30 @@ function selectArtifact(ref, label, audioUrl, downloadUrl, path) {
     el.downloadLink.download = label;
     el.downloadLink.classList.remove("is-disabled");
     el.downloadLink.setAttribute("aria-disabled", "false");
+  } else {
+    el.downloadLink.href = "#";
+    el.downloadLink.classList.add("is-disabled");
+    el.downloadLink.setAttribute("aria-disabled", "true");
   }
   document.querySelectorAll(".artifact-card").forEach((card) => {
     card.classList.toggle("is-selected", card.dataset.ref === ref);
   });
   updateButtons();
+  if (options.skipAnalysisFetch || !state.task || !ref.startsWith("step:")) {
+    return;
+  }
+  const runId = ref.split(":")[1];
+  if (!runId) {
+    return;
+  }
+  try {
+    const data = await apiJson(
+      `/api/tasks/${state.task.task_id}/runs/${runId}?waveform_seconds=${encodeURIComponent(el.waveformSeconds.value)}`,
+    );
+    renderAnalysis(data.analysis);
+  } catch (error) {
+    appendLog(`读取步骤分析失败: ${error.message}`);
+  }
 }
 
 function artifactCard(output, runId) {
@@ -331,7 +355,7 @@ function artifactCard(output, runId) {
   heading.className = "secondary-button";
   heading.textContent = `选中${title}`;
   heading.addEventListener("click", () => {
-    selectArtifact(ref, title, output.audio_url, output.download_url, output.path);
+    void selectArtifact(ref, title, output.audio_url, output.download_url, output.path);
   });
   const label = document.createElement("strong");
   label.textContent = title;
@@ -371,7 +395,7 @@ function renderSteps(task) {
   inputSelect.className = "secondary-button";
   inputSelect.textContent = "选中原音频";
   inputSelect.addEventListener("click", () => {
-    selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
+    void selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
   });
   inputWrap.append(inputLabel, inputSelect);
   const inputGrid = document.createElement("div");
@@ -456,9 +480,64 @@ async function createTask() {
   const task = await apiJson("/api/tasks", { method: "POST", body: formData });
   state.task = task;
   updateInputPreview();
-  selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
   renderSteps(task);
+  await selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
+  await loadTaskList(task.task_id);
   return task;
+}
+
+async function loadTaskList(selectedId) {
+  const payload = await apiJson("/api/tasks");
+  const tasks = payload.tasks || [];
+  const current = selectedId || state.task?.task_id || el.taskSelect.value;
+  el.taskSelect.replaceChildren();
+  if (!tasks.length) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "暂无磁盘任务";
+    el.taskSelect.appendChild(option);
+    el.openTaskButton.disabled = true;
+    return;
+  }
+  tasks.forEach((task) => {
+    const option = document.createElement("option");
+    option.value = task.task_id;
+    option.textContent = `${task.title} · ${task.step_count} 步`;
+    el.taskSelect.appendChild(option);
+  });
+  if (current && tasks.some((task) => task.task_id === current)) {
+    el.taskSelect.value = current;
+  }
+  el.openTaskButton.disabled = state.busy || !el.taskSelect.value;
+}
+
+async function openSelectedTask() {
+  const taskId = el.taskSelect.value;
+  if (!taskId) {
+    setStatus("没有可打开的任务", true);
+    return;
+  }
+  const task = await apiJson(`/api/tasks/${taskId}`);
+  state.task = task;
+  renderSteps(task);
+  updateInputPreview();
+  const last = (task.steps || []).at(-1);
+  const firstOutput = last?.outputs?.[0];
+  if (firstOutput) {
+    await selectArtifact(
+      `step:${last.run_id}:${firstOutput.id}`,
+      TOOL_LABELS[firstOutput.id] || firstOutput.id,
+      firstOutput.audio_url,
+      firstOutput.download_url,
+      firstOutput.path,
+    );
+  } else {
+    await selectArtifact("input", "原音频", task.input_audio_url, null, task.input_path);
+  }
+  el.resultStamp.textContent = task.created_at;
+  setStatus("已打开磁盘任务");
+  appendLog(`打开任务: ${task.task_id}`);
+  updateButtons();
 }
 
 async function runToolOnRef(toolId, inputRef) {
@@ -478,12 +557,13 @@ async function runToolOnRef(toolId, inputRef) {
   (data.logs || []).forEach((line) => appendLog(line));
   const first = data.outputs?.[0];
   if (first) {
-    selectArtifact(
+    await selectArtifact(
       `step:${data.run_id}:${first.id}`,
       TOOL_LABELS[first.id] || first.id,
       first.audio_url,
       first.download_url,
       first.path,
+      { skipAnalysisFetch: true },
     );
   }
   el.resultStamp.textContent = data.task.created_at;
@@ -604,6 +684,12 @@ function bindEvents() {
     el.waveformSecondsText.textContent = `${el.waveformSeconds.value} 秒`;
   });
   el.runButton.addEventListener("click", runCompose);
+  el.openTaskButton.addEventListener("click", () => {
+    void openSelectedTask().catch((error) => {
+      setStatus(error.message, true);
+      appendLog(`打开任务失败: ${error.message}`);
+    });
+  });
   el.reprocessButton.addEventListener("click", runReprocess);
   el.resetButton.addEventListener("click", () => {
     resetResult(true);
@@ -621,6 +707,7 @@ async function init() {
   try {
     await loadHealth();
     await loadSamples();
+    await loadTaskList();
   } catch (error) {
     setBadge("status-error", "检查失败");
     setStatus(error.message, true);

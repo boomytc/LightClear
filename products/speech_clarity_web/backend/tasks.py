@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import hashlib
 import json
 import shutil
 import time
@@ -43,6 +44,41 @@ def save_task(product_root: Path, payload: dict[str, object]) -> None:
     path = task_json_path(product_root, task_id)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def write_upload(product_root: Path, data: bytes, original_name: str) -> Path:
+    digest = hashlib.sha1(data).hexdigest()[:12]
+    filename = safe_filename(original_name)
+    suffix = Path(filename).suffix
+    upload_dir = product_root / "workspace" / "uploads"
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    path = upload_dir / f"{Path(filename).stem}_{digest}{suffix}"
+    if not path.exists():
+        path.write_bytes(data)
+    return path
+
+
+def list_tasks(product_root: Path) -> list[dict[str, object]]:
+    items: list[dict[str, object]] = []
+    root = tasks_root(product_root)
+    for path in root.glob("*/task.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        task_id = str(payload.get("task_id") or path.parent.name)
+        steps = payload.get("steps") or []
+        items.append(
+            {
+                "task_id": task_id,
+                "title": payload.get("title") or task_id,
+                "created_at": payload.get("created_at") or "",
+                "status": payload.get("status") or "ready",
+                "step_count": len(steps) if isinstance(steps, list) else 0,
+            }
+        )
+    items.sort(key=lambda item: str(item.get("created_at") or ""), reverse=True)
+    return items[:50]
 
 
 def create_task(product_root: Path, source_path: Path, title: str) -> dict[str, object]:

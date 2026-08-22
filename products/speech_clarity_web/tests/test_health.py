@@ -43,6 +43,8 @@ def load_health() -> dict[str, object]:
     sample_count = payload.get("sample_count")
     if not isinstance(sample_count, int) or sample_count < 3:
         raise AssertionError(f"sample_count must be >= 3: {payload}")
+    if payload.get("tasks_dir") != "workspace/tasks":
+        raise AssertionError(f"tasks_dir must be workspace/tasks: {payload}")
     return payload
 
 

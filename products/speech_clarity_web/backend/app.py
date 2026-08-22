@@ -30,12 +30,14 @@ from .tasks import (
     append_step,
     create_task,
     find_step,
+    list_tasks,
     load_task,
     project_relative,
     resolve_artifact,
     resolve_input_ref,
     save_task,
     task_dir,
+    write_upload,
 )
 
 
@@ -148,10 +150,7 @@ def build_run_payload(
 
 @app.get("/", include_in_schema=False)
 def index() -> FileResponse:
-    index_path = FRONTEND_DIR / "index.html"
-    if not index_path.is_file():
-        raise HTTPException(status_code=404, detail="前端尚未接入。")
-    return FileResponse(index_path)
+    return FileResponse(FRONTEND_DIR / "index.html")
 
 
 @app.get("/favicon.ico", include_in_schema=False)
@@ -166,7 +165,7 @@ def health() -> dict[str, object]:
         "app": APP_NAME,
         "scene": SCENE_NAME,
         "sample_count": len(samples),
-        "default_output_dir": TASKS_DIR,
+        "tasks_dir": TASKS_DIR,
         "supported_extensions": list(AUDIO_EXTENSIONS),
         "tools": list_tool_status(),
     }
@@ -221,17 +220,18 @@ async def create_task_endpoint(
             raise HTTPException(status_code=400, detail="上传文件为空。")
         if len(data) > MAX_UPLOAD_BYTES:
             raise HTTPException(status_code=413, detail="上传文件超过 200MB。")
-        upload_dir = PRODUCT_ROOT / "workspace" / "uploads"
-        upload_dir.mkdir(parents=True, exist_ok=True)
-        upload_path = upload_dir / safe_name
-        upload_path.write_bytes(data)
-        input_path = upload_path
+        input_path = write_upload(PRODUCT_ROOT, data, safe_name)
         title = file.filename
     else:
         raise HTTPException(status_code=400, detail="音频来源无效。")
 
     payload = create_task(PRODUCT_ROOT, input_path, title)
     return decorate_task(payload)
+
+
+@app.get("/api/tasks")
+def get_tasks() -> dict[str, object]:
+    return {"tasks": list_tasks(PRODUCT_ROOT)}
 
 
 @app.get("/api/tasks/{task_id}")
@@ -323,7 +323,7 @@ def create_run(
     except HTTPException:
         raise
     except Exception as exc:
-        payload["status"] = "failed"
+        payload["status"] = "failed" if not payload.get("steps") else "succeeded"
         save_task(PRODUCT_ROOT, payload)
         raise HTTPException(status_code=500, detail=f"处理失败: {exc}") from exc
 

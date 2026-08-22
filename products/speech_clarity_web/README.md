@@ -28,14 +28,16 @@ uv pip install -e .
 - `GET /api/tools`：与 health 中的 `tools` 相同。
 - `GET /api/samples`：产品 `assets/` 下的三类示例，含 `suggested_tools`。
 - `POST /api/tasks`：从示例或上传创建任务，拷入 `workspace/tasks/<task_id>/`。
+- `GET /api/tasks`：扫描磁盘上的任务列表（刷新后仍可打开）。
 - `POST /api/tasks/{task_id}/runs`：对一份 `input_ref` 跑 **一个** 工具。`input_ref` 为 `input` 或 `step:<run_id>:<output_id>`。
 - `GET /api/tasks/{task_id}`：任务与步骤。
+- `GET /api/tasks/{task_id}/runs/{run_id}`：按步骤重算分析。
 - `GET /api/tasks/{task_id}/audio/{artifact_id}`：播放。
 - `GET /api/tasks/{task_id}/download/{artifact_id}`：下载。
 
 没有 `POST /api/pipeline`。缺某一工具权重时只对该工具 503。
 
-客户端默认顺序：分离 → 增强 → 超分。叠人样例默认只勾分离；带噪只勾增强；带限只勾超分。
+客户端默认顺序：分离 → 增强 → 超分。勾选分离后再勾增强或超分时，会对分离出的每一路各跑一次。叠人样例默认只勾分离；带噪只勾增强；带限只勾超分。选中某一步产物会刷新该步分析，并可对这一路再跑另一件工具。
 
 ## 样例
 

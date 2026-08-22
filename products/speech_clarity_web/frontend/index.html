@@ -63,6 +63,16 @@
           <button id="resetButton" type="button" class="secondary-button">清空结果</button>
         </div>
 
+        <section class="panel-section" aria-labelledby="history-heading">
+          <h2 id="history-heading">磁盘任务</h2>
+          <p class="order-hint">产物在 workspace/tasks。刷新后可打开已有任务继续听、再处理。</p>
+          <div class="field-stack">
+            <label for="taskSelect">已有任务</label>
+            <select id="taskSelect"></select>
+          </div>
+          <button id="openTaskButton" type="button" class="secondary-button">打开任务</button>
+        </section>
+
         <section class="panel-section" aria-labelledby="reprocess-heading">
           <h2 id="reprocess-heading">对选中音频再处理</h2>
           <p id="selectedArtifactLabel" class="order-hint">尚未选中产物</p>

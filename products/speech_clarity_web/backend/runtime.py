@@ -14,7 +14,6 @@ AUDIO_EXTENSIONS = ("wav", "mp3", "flac", "ogg", "aac", "aiff", "m4a")
 SCENE_NAME = "speech_clarity"
 APP_NAME = "speech_clarity_web"
 TASKS_DIR = "workspace/tasks"
-NUM_SPEAKERS = 2
 
 TOOL_SPECS = {
     "enhance": {
@@ -23,7 +22,6 @@ TOOL_SPECS = {
         "model_root": Path("/Users/boom/Model/SE"),
         "outputs": ("enhanced",),
         "label": "增强",
-        "checkpoint_mode": "file",
     },
     "separate": {
         "task": "speech_separation",
@@ -31,7 +29,6 @@ TOOL_SPECS = {
         "model_root": Path("/Users/boom/Model/SS"),
         "outputs": ("speaker-1", "speaker-2"),
         "label": "分离",
-        "checkpoint_mode": "listed",
     },
     "super_resolve": {
         "task": "speech_super_resolution",
@@ -39,7 +36,6 @@ TOOL_SPECS = {
         "model_root": Path("/Users/boom/Model/SR"),
         "outputs": ("super_resolved",),
         "label": "超分",
-        "checkpoint_mode": "listed",
     },
 }
 TOOL_IDS = tuple(TOOL_SPECS)
@@ -102,13 +98,10 @@ def model_checkpoint_dir(tool_id: str) -> Path:
 
 
 def tool_is_available(tool_id: str) -> bool:
-    spec = TOOL_SPECS[tool_id]
     checkpoint_dir = model_checkpoint_dir(tool_id)
     best_checkpoint = checkpoint_dir / "last_best_checkpoint"
     if not checkpoint_dir.is_dir() or not best_checkpoint.is_file():
         return False
-    if spec["checkpoint_mode"] == "file":
-        return True
     checkpoint_names = [
         line.strip()
         for line in best_checkpoint.read_text(encoding="utf-8").splitlines()
