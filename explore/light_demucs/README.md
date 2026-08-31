@@ -40,4 +40,4 @@ uv pip install -e .
 
 ## 模型
 
-见 `docs/模型列表.md` 与 `docs/models/`。
+见 `docs/模型列表.md`、`docs/models/` 与 `docs/参数调优与音频导出.md`。

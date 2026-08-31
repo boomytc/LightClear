@@ -18,7 +18,7 @@
 
 - Python 包源码位于 `third_party/demucs`，公共入口是 `from demucs.api import Separator`。
 - `third_party/demucs` 是上游 `adefossez/demucs` v4.1.0（`eeac1d15891af95b1288d2884b95baa3e5baa96c`）的 vendor 副本。允许在这份副本上做本模块需要的上游修改。官方仓库更新后单独判断是否值得同步，不要自动覆盖本地改动。产品 `vocal_isolate_web` 从本模块 `third_party/demucs` 再拷一份，不要从仓库外的 Demucs clone 直拷。
-- 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`。
+- 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`；参数调优与导出见 `docs/参数调优与音频导出.md`。
 - 权重目录：本模块 `models/<model>/`，不进版本库。安装：`.venv/bin/python scripts/install_model.py <htdemucs|htdemucs_ft|htdemucs_6s>`。缺目录直接失败。不要写家庭缓存，不要安装时自动拷进产品。产品要权重时自己指定模型名和目标目录再装一份。
 - 共享样例使用仓库根 `assets/audio/music/` 的绝对路径。不要在本模块再拷一份共享音频。
 - Demo 位于 `demo/`。输出写入本模块 `outputs/`。

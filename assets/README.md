@@ -24,16 +24,29 @@ assets/
 ## 使用规则
 
 - Demo / CLI 顶部显式写出绝对路径，例如 `/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav`。
-- 批量输入优先用 `manifests/*.scp` 列出的路径。把用途目录交给 ClearVoice 目录输入 API 时，目录内文件可能比对应 scp 更多（例如 `audio/noisy/` 含 `test.wav`，`video/speech/` 含 `003.avi`）。
+- 批量输入优先用 `manifests/*.scp`。ClearVoice 目录输入会处理该目录下全部文件；多于 scp 的 noisy / bandlimited / video 文件、以及没有 scp 的 music 文件，见「不进 scp 的额外样例」。
 - 不要把本目录当作产品默认样例池去 `glob`。
 
-## 清单
+## 批处理清单
 
-| 文件 | 用途 |
+| 文件 | 覆盖 |
 | --- | --- |
-| `manifests/se.scp` | 语音增强批处理 |
-| `manifests/ss.scp` | 说话人分离批处理 |
-| `manifests/sr.scp` | 语音超分辨率批处理 |
-| `manifests/tse.scp` | 目标说话人提取批处理 |
-| `audio/music/test.mp3` | 上游 Demucs 烟雾片段，人声能量很低 |
-| `audio/music/next_station_heaven.mp3` | 带唱短片段（蔡卓妍《下一站天后》DJ 混音约 0:50 起 30 秒），仅供本机演示 |
+| `manifests/se.scp` | `audio/noisy/` 下 `input.wav`、`input2.wav`（16kHz）、`p232_005.wav`、`p232_007.wav`（48kHz，48k 语音增强批次样本）、`speech1.{flac,mp3,ogg,wav}`、`speech2.{aac,aiff,wav}` |
+| `manifests/ss.scp` | `audio/mixture/` 全部文件 |
+| `manifests/sr.scp` | `audio/bandlimited/LJ001-0001.wav` … `LJ001-0010.wav` |
+| `manifests/tse.scp` | `video/speech/001.avi`、`002.avi` |
+
+## 不进 scp 的额外样例
+
+ClearVoice 把用途目录交给目录输入 API 时，会处理同目录下全部文件，因此 `noisy/`、`bandlimited/`、`video/speech/` 里下列文件会和对应 scp 一起跑。`audio/music/` 没有 scp，只给 Demucs demo 写死路径。标了「仅供本机演示」的不要当公开素材。
+
+| 文件 | 采样率 / 格式 | 用途 |
+| --- | --- | --- |
+| `audio/music/test.mp3` | 44.1kHz MP3 | 上游 Demucs 烟雾片段，人声能量很低 |
+| `audio/music/next_station_heaven.mp3` | 44.1kHz MP3 | 带唱短片段（蔡卓妍《下一站天后》DJ 混音约 0:50 起 30 秒），仅供本机演示 |
+| `audio/noisy/test.wav` | 48kHz WAV | `demo_mossformergan_se.py` 单文件输入。48k 增强批次已覆盖 `p232_*.wav` |
+| `audio/noisy/speech2_short.wav` | 44.1kHz float WAV | 立体声短样本，目录模式额外文件 |
+| `audio/noisy/aviation_glideslope_too_low.wav` | 16kHz WAV | 航空 GPWS「下滑道太低」告警带噪语音，特殊场景，仅供本机演示 |
+| `audio/noisy/aviation_decision_height.wav` | 16kHz WAV | 航空 GPWS「决断高度」告警带噪语音，特殊场景，仅供本机演示 |
+| `audio/bandlimited/input_sr.wav` | 16kHz WAV | `demo_sr.py` 单文件输入。超分批次已覆盖 LJ 十条 |
+| `video/speech/003.avi` | 视频 | 目标说话人提取目录模式额外样本 |
