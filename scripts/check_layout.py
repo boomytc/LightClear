@@ -102,8 +102,6 @@ def main() -> None:
             and "install_htdemucs.py" in text
         ):
             fail(f"{relative} still documents install_htdemucs.py")
-        if relative.endswith("faceDetector/s3fd/__init__.py") and "gdown" in text:
-            fail(f"{relative} still downloads sfd_face.pth with gdown")
         if relative.startswith("products/speech_clarity_web/") and (
             "products.speech_enhance_web" in text
             or "products.speech_separation_web" in text
@@ -127,6 +125,10 @@ def main() -> None:
             continue
         if relative.endswith((".py", ".md", ".yaml", ".yml", ".html", ".js", ".toml")):
             text = path.read_text(encoding="utf-8")
+            # third_party is skipped by iter_tracked_files, so the vendored loader
+            # guard has to run over the raw tracked list.
+            if relative.endswith("faceDetector/s3fd/__init__.py") and "gdown" in text:
+                fail(f"{relative} still downloads sfd_face.pth with gdown")
             if "clearvoice_samples" in text:
                 fail(f"{relative} still mentions retired sample tree")
             if relative.endswith(".md"):
