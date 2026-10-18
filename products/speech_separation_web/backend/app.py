@@ -287,11 +287,6 @@ def job_audio(job_id: str, variant: str) -> FileResponse:
     return FileResponse(path, media_type=audio_mime_type(path))
 
 
-@app.get("/api/jobs/{job_id}/download")
-def first_job_download(job_id: str) -> FileResponse:
-    return job_download(job_id, "speaker-1")
-
-
 @app.get("/api/jobs/{job_id}/download/{variant}")
 def job_download(job_id: str, variant: str) -> FileResponse:
     record = get_job(job_id)

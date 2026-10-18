@@ -16,11 +16,9 @@ const state = {
   tools: [],
   selectedTools: new Set(),
   busy: false,
-  activeTab: "waveform",
   logs: [],
   task: null,
   selectedRef: "input",
-  selectedLabel: "原音频",
 };
 
 const el = {};
@@ -305,7 +303,6 @@ function renderTiming(timing) {
 
 async function selectArtifact(ref, label, audioUrl, downloadUrl, path, options = {}) {
   state.selectedRef = ref;
-  state.selectedLabel = label;
   el.selectedArtifactLabel.textContent = `当前选中：${label}`;
   el.outputName.textContent = label;
   el.outputName.classList.remove("muted");
@@ -423,7 +420,6 @@ function renderSteps(task) {
 }
 
 function activateTab(tabName) {
-  state.activeTab = tabName;
   document.querySelectorAll(".tab-button").forEach((button) => {
     const active = button.dataset.tab === tabName;
     button.classList.toggle("is-active", active);
@@ -437,7 +433,6 @@ function activateTab(tabName) {
 function resetResult(clearLogs) {
   state.task = null;
   state.selectedRef = "input";
-  state.selectedLabel = "原音频";
   el.outputName.textContent = "无结果";
   el.outputName.classList.add("muted");
   el.outputPath.textContent = "-";

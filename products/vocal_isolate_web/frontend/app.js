@@ -4,8 +4,6 @@ const state = {
   models: [],
   selectedModel: "htdemucs",
   busy: false,
-  modelAvailable: false,
-  activeTab: "waveform",
   logs: [],
 };
 
@@ -301,7 +299,6 @@ function renderResult(data) {
 }
 
 function activateTab(tabName) {
-  state.activeTab = tabName;
   document.querySelectorAll(".tab-button").forEach((button) => {
     const active = button.dataset.tab === tabName;
     button.classList.toggle("is-active", active);
@@ -314,7 +311,6 @@ function activateTab(tabName) {
 
 function applySelectedModel() {
   const spec = selectedModelSpec();
-  state.modelAvailable = Boolean(spec?.available);
   el.modelName.textContent = spec?.name || state.selectedModel;
   el.checkpointPath.textContent = spec?.checkpoint_dir || "-";
   el.modelNote.textContent = spec?.note || "";

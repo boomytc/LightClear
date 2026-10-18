@@ -181,30 +181,11 @@ a:focus-visible {
   color: var(--warning);
 }
 
-.status-list {
-  display: grid;
-  gap: 0.65rem;
-  margin: 0.9rem 0 0;
-}
-
-.status-list div {
-  display: grid;
-  gap: 0.18rem;
-}
-
-.status-list dt,
 .field-stack label,
 .label-row span {
   color: var(--muted);
   font-size: 0.82rem;
   font-weight: 680;
-}
-
-.status-list dd {
-  margin: 0;
-  overflow-wrap: anywhere;
-  color: var(--text);
-  font-size: 0.9rem;
 }
 
 .segmented-control {

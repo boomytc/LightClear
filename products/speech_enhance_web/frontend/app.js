@@ -3,7 +3,6 @@ const state = {
   samples: [],
   busy: false,
   modelAvailable: false,
-  activeTab: "waveform",
   logs: [],
 };
 
@@ -260,7 +259,6 @@ function renderResult(data) {
 }
 
 function activateTab(tabName) {
-  state.activeTab = tabName;
   document.querySelectorAll(".tab-button").forEach((button) => {
     const active = button.dataset.tab === tabName;
     button.classList.toggle("is-active", active);
