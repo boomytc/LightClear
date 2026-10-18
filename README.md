@@ -87,12 +87,22 @@ cd ../../products/speech_clarity_web
 
 cd ../speech_enhance_web
 .venv/bin/python -m tests.test_health
+.venv/bin/python -m tests.test_job_contract
+
+cd ../speech_separation_web
+.venv/bin/python -m tests.test_health
+.venv/bin/python -m tests.test_job_contract
+
+cd ../speech_super_resolution_web
+.venv/bin/python -m tests.test_health
+.venv/bin/python -m tests.test_job_contract
 
 cd ../vocal_isolate_web
 .venv/bin/python -m tests.test_health
+.venv/bin/python -m tests.test_job_contract
 
 cd ../..
 python3 scripts/check_layout.py
 ```
 
-完整推理前确认对应权重可用。缺权重是环境限制。
+`test_health` 只读 health，秒级完成。`test_task_contract` / `test_job_contract` 会真跑一次推理，覆盖接口、采样率、产物路径与画图，单产品几十秒。完整推理前确认对应权重可用；缺权重是环境限制，脚本会打印 SKIP 并只校验拒绝分支。
