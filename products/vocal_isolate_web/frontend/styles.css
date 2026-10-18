@@ -420,6 +420,7 @@ audio {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.82rem;
   overflow-wrap: anywhere;
+  white-space: pre-line;
 }
 
 .metric-grid {
