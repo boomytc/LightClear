@@ -77,10 +77,12 @@ def main() -> None:
 
     available = {tool_id: tool_is_available(tool_id) for tool_id in ("enhance", "separate", "super_resolve")}
     report["available"] = available
+    report["skipped_tools"] = [tool_id for tool_id, is_ready in available.items() if not is_ready]
 
     for tool_id, is_ready in available.items():
         if is_ready:
             continue
+        print(f"SKIP: {tool_id} 权重未就绪，本次只校验 503 分支", file=sys.stderr)
         blocked = _run(client, task_id, tool_id, "input")
         if blocked.status_code != 503:
             raise AssertionError(f"{tool_id} unavailable should 503, got {blocked.status_code}: {blocked.text}")
@@ -145,8 +147,6 @@ def main() -> None:
             raise AssertionError(f"bandlimited input should be 16000 Hz, got {input_sr}")
         if output_sr != 48000:
             raise AssertionError(f"super_resolve output should be 48000 Hz, got {output_sr}")
-        if input_sr == output_sr:
-            raise AssertionError("super_resolve must not report identical sample rates")
         report["super_resolve_input_sr"] = input_sr
         report["super_resolve_output_sr"] = output_sr
 
