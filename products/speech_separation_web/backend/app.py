@@ -14,6 +14,8 @@ from .analysis import build_analysis_payload
 from .runtime import (
     AUDIO_EXTENSIONS,
     DEFAULT_OUTPUT_DIR,
+    MODEL_NAME,
+    TASK_NAME,
     ModelHandle,
     SeparationResult,
     audio_mime_type,
@@ -186,8 +188,8 @@ def health() -> dict[str, object]:
     samples = list_sample_audio(PRODUCT_ROOT)
     return {
         "app": "speech_separation_web",
-        "model_name": "MossFormer2_SS_16K",
-        "task": "speech_separation",
+        "model_name": MODEL_NAME,
+        "task": TASK_NAME,
         "model_available": model_is_available(PRODUCT_ROOT),
         "checkpoint_dir": project_relative(checkpoint_dir),
         "sample_count": len(samples),

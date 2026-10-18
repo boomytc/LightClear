@@ -14,6 +14,8 @@ from .analysis import build_analysis_payload
 from .runtime import (
     AUDIO_EXTENSIONS,
     DEFAULT_OUTPUT_DIR,
+    MODEL_NAME,
+    TASK_NAME,
     EnhancementResult,
     ModelHandle,
     audio_mime_type,
@@ -158,8 +160,8 @@ def health() -> dict[str, object]:
     samples = list_sample_audio(PRODUCT_ROOT)
     return {
         "app": "speech_enhance_web",
-        "model_name": "MossFormer2_SE_48K",
-        "task": "speech_enhancement",
+        "model_name": MODEL_NAME,
+        "task": TASK_NAME,
         "model_available": model_is_available(PRODUCT_ROOT),
         "checkpoint_dir": project_relative(checkpoint_dir),
         "sample_count": len(samples),

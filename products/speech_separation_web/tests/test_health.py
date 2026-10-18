@@ -14,6 +14,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 from fastapi.testclient import TestClient
 
 from backend.app import app
+from backend.runtime import MODEL_NAME, TASK_NAME
 
 
 def load_health() -> dict[str, object]:
@@ -24,8 +25,13 @@ def load_health() -> dict[str, object]:
     payload = response.json()
     if payload.get("app") != "speech_separation_web":
         raise AssertionError(f"unexpected app id: {payload}")
-    if payload.get("task") != "speech_separation":
+    if payload.get("task") != TASK_NAME:
         raise AssertionError(f"unexpected task: {payload}")
+    if payload.get("model_name") != MODEL_NAME:
+        raise AssertionError(f"unexpected model: {payload}")
+    checkpoint_dir = payload.get("checkpoint_dir")
+    if not isinstance(checkpoint_dir, str) or not checkpoint_dir.endswith(MODEL_NAME):
+        raise AssertionError(f"checkpoint_dir must end with {MODEL_NAME}: {payload}")
     sample_count = payload.get("sample_count")
     if not isinstance(sample_count, int) or sample_count < 1:
         raise AssertionError(f"sample_count must be >= 1: {payload}")
