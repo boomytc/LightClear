@@ -25,21 +25,21 @@
 
 ## 从哪进
 
-从仓库根目录：
+所有探索模块的 `demo/` 均按硬件拆分为 `demo/cpu/`、`demo/mps/`、`demo/cuda/`，脚本底部附真实硬件实测输出注释。从仓库根目录：
 
 ```bash
 cd explore/light_clearvoice
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/demo_se.py
+.venv/bin/python demo/cpu/demo_se.py    # 或 demo/mps/demo_se.py / demo/cuda/demo_se.py
 
 cd ../light_demucs
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/demo_vocals.py
+.venv/bin/python demo/cpu/demo_vocals.py  # 或 demo/mps/demo_vocals.py / demo/cuda/demo_vocals.py
 
 cd ../light_voice_isolator
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/demo_offline_single.py
+.venv/bin/python demo/mps/demo_offline_single.py  # 或 demo/cuda/demo_offline_single.py
 ```
