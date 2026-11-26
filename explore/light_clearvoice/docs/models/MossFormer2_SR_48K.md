@@ -27,8 +27,14 @@ PyTorch。
 
 ```python
 from clearvoice import ClearVoice
-cv = ClearVoice(task="speech_super_resolution", model_names=["MossFormer2_SR_48K"])
+cv = ClearVoice(task="speech_super_resolution", model_names=["MossFormer2_SR_48K"], device="cuda:0")  # 或 "mps" / "cpu"
 ```
+
+## 硬件实测（`input_sr.wav`，16 kHz / 2.398 s → 48 kHz）
+
+- Colab CPU（AMD EPYC 7B12 2 vCPU，PyTorch 2.15.0+cpu）：单文件 `21.008 s`（RTF `8.7617`，`0.11x`）；Apple M4 Pro CPU 单文件约 `6.15 s`。
+- Apple M4 Pro MPS（PyTorch 2.13.0）：冷启动 `1.304 s` / 稳态 `0.525 s`（RTF `0.2190`，`4.57x`），与 CPU 最大误差 `2.24e-06`，无 NaN。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，`cuda:0`）：冷启动 `1.181 s` / 稳态 `0.224 s`（RTF `0.0935`，`10.70x`）；峰值显存 `allocated=1111.2 MiB, reserved=1772.0 MiB`。
 
 ## 未验证/待确认
 

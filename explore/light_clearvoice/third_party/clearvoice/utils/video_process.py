@@ -9,9 +9,8 @@ from scipy.interpolate import interp1d
 from sklearn.metrics import accuracy_score, f1_score
 import soundfile as sf
 
-from scenedetect.video_manager import VideoManager
+from scenedetect import open_video
 from scenedetect.scene_manager import SceneManager
-from scenedetect.frame_timecode import FrameTimecode
 from scenedetect.stats_manager import StatsManager
 from scenedetect.detectors import ContentDetector
 
@@ -48,7 +47,7 @@ def args_param():
     parser.add_argument('--cropScale',             type=float, default=0.40, help='Scale bounding box')
     parser.add_argument('--start',                 type=int, default=0,   help='The start time of the video')
     parser.add_argument('--duration',              type=int, default=0,  help='The duration of the video, when set as 0, will extract the whole video')
-    video_args = parser.parse_args()
+    video_args = parser.parse_args([])
     return video_args
 
 
@@ -145,18 +144,15 @@ def main(video_args, args):
 
 def scene_detect(video_args):
     # CPU: Scene detection, output is the list of each shot's time duration
-    videoManager = VideoManager([video_args.videoFilePath])
+    video = open_video(video_args.videoFilePath)
     statsManager = StatsManager()
     sceneManager = SceneManager(statsManager)
     sceneManager.add_detector(ContentDetector())
-    baseTimecode = videoManager.get_base_timecode()
-    videoManager.set_downscale_factor()
-    videoManager.start()
-    sceneManager.detect_scenes(frame_source = videoManager)
-    sceneList = sceneManager.get_scene_list(baseTimecode)
+    sceneManager.detect_scenes(video=video)
+    sceneList = sceneManager.get_scene_list()
     savePath = os.path.join(video_args.pyworkPath, 'scene.pckl')
     if sceneList == []:
-        sceneList = [(videoManager.get_base_timecode(),videoManager.get_current_timecode())]
+        sceneList = [(video.base_timecode, video.base_timecode + video.duration)]
     with open(savePath, 'wb') as fil:
         pickle.dump(sceneList, fil)
         sys.stderr.write('%s - scenes detected %d\n'%(video_args.videoFilePath, len(sceneList)))

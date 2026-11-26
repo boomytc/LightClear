@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import py_compile
 from pathlib import Path
 
@@ -11,6 +12,36 @@ REQUIRED_TASKS = (
     "speech_super_resolution",
     "target_speaker_extraction",
 )
+REQUIRED_DEMOS_BY_BACKEND = {
+    "cpu": {
+        "demo_se.py",
+        "demo_frcrn_se.py",
+        "demo_sr.py",
+        "demo_Numpy2Numpy.py",
+        "demo_tensor2tensor.py",
+    },
+    "mps": {
+        "demo_se.py",
+        "demo_ss.py",
+        "demo_sr.py",
+        "demo_Numpy2Numpy.py",
+    },
+    "cuda": {
+        "demo_se.py",
+        "demo_frcrn_se.py",
+        "demo_mossformergan_se.py",
+        "demo_ss.py",
+        "demo_sr.py",
+        "demo_tse.py",
+        "demo_Numpy2Numpy.py",
+        "demo_tensor2tensor.py",
+    },
+}
+EXPECTED_DEVICE_LITERALS = {
+    "cpu": 'DEVICE = "cpu"',
+    "mps": 'DEVICE = "mps"',
+    "cuda": 'DEVICE = "cuda:0"',
+}
 IMPORT_LINE = "from clearvoice import ClearVoice"
 
 
@@ -28,22 +59,44 @@ def load_clearvoice_name() -> str:
 
 def compile_demos() -> list[str]:
     demo_dir = MODULE_ROOT / "demo"
-    demo_files = sorted(demo_dir.glob("demo_*.py"))
-    if not demo_files:
-        raise AssertionError(f"no demo scripts in {demo_dir}")
+    stray_top = sorted(demo_dir.glob("demo_*.py"))
+    if stray_top:
+        raise AssertionError(f"unexpected top-level demos in {demo_dir}: {[p.name for p in stray_top]}")
+
     names: list[str] = []
     sources: list[str] = []
-    for path in demo_files:
-        py_compile.compile(str(path), doraise=True)
-        text = path.read_text(encoding="utf-8")
-        sources.append(text)
-        names.append(path.name)
-        if IMPORT_LINE not in text:
-            raise AssertionError(f"{path.name} missing {IMPORT_LINE!r}")
+    for backend, required_demos in REQUIRED_DEMOS_BY_BACKEND.items():
+        backend_dir = demo_dir / backend
+        demo_files = sorted(backend_dir.glob("demo_*.py"))
+        if not demo_files:
+            raise AssertionError(f"no demo scripts in {backend_dir}")
+        backend_names: set[str] = set()
+        for path in demo_files:
+            py_compile.compile(str(path), doraise=True)
+            text = path.read_text(encoding="utf-8")
+            sources.append(text)
+            rel_name = f"{backend}/{path.name}"
+            names.append(rel_name)
+            backend_names.add(path.name)
+            if IMPORT_LINE not in text:
+                raise AssertionError(f"{rel_name} missing {IMPORT_LINE!r}")
+            if EXPECTED_DEVICE_LITERALS[backend] not in text:
+                raise AssertionError(f"{rel_name} must pin {EXPECTED_DEVICE_LITERALS[backend]!r}")
+            tree = ast.parse(text, filename=str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    raise AssertionError(f"{rel_name} must not define functions (found {node.name!r})")
+        missing = sorted(required_demos.difference(backend_names))
+        if missing:
+            raise AssertionError(f"missing {backend} demo scripts: {missing}")
+        extra = sorted(backend_names.difference(required_demos))
+        if extra:
+            raise AssertionError(f"unexpected {backend} demo scripts: {extra}")
+
     joined = "\n".join(sources)
-    missing = [task for task in REQUIRED_TASKS if task not in joined]
-    if missing:
-        raise AssertionError(f"demo sources missing tasks: {missing}")
+    missing_tasks = [task for task in REQUIRED_TASKS if task not in joined]
+    if missing_tasks:
+        raise AssertionError(f"demo sources missing tasks: {missing_tasks}")
     return names
 
 
@@ -74,6 +127,7 @@ def main() -> None:
     demos = compile_demos()
     sfd_face = check_sfd_face_loader()
     print(f"import_name={name}")
+    print(f"demo_count={len(demos)}")
     print("demos=" + ",".join(demos))
     print(f"sfd_face={sfd_face}")
 

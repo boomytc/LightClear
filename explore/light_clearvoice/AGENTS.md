@@ -23,8 +23,8 @@
   - SS：`/Users/boom/Model/SS/<ModelName>`
   - SR：`/Users/boom/Model/SR/<ModelName>`
 - 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 必须与中心目录约定一致。yaml 里的 `input_path` / `output_dir` 只是配置占位，真正输入输出由 `ClearVoice(...)` 调用参数决定。
-- 共享样例使用仓库根 `assets/` 的绝对路径。不要在本模块再拷一份共享 wav。
-- Demo 位于 `demo/`。输出写入本模块 `outputs/`。
+- 共享样例使用仓库根 `assets/`（demo 通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台解析，`.scp` 清单在 `dataloader/misc.py` 内自动做跨平台路径映射）。不要在本模块再拷一份共享 wav。
+- Demo 按实际可用硬件分为 `demo/cpu/`（5 个）、`demo/mps/`（4 个）、`demo/cuda/`（8 个）；`ClearVoice(...)` 已支持可选 `device` 与 `checkpoint_dir` 参数及 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `/Users/boom/Model`）。输出按硬件写入本模块 `outputs/{cpu,mps,cuda}/`。
 - 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。
 - TSE 人脸检测权重 `third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth` 不纳入版本控制。上游 S3FD 从该文件旁的 `__file__` 加载，不在 `checkpoint_dir` 里。缺文件时 `ClearVoice` 仍可导入，构造人脸检测器会直接失败，不要 `gdown`。SE / SS / SR 单工具产品与 `speech_clarity_web` 不跑 TSE，不必拷这份权重。TSE 网络权重仍走 `/Users/boom/Model/SE/AV_MossFormer2_TSE_16K`。
 
@@ -41,7 +41,7 @@
 ## Validation
 
 - `.venv/bin/python -c "from clearvoice import ClearVoice; print(ClearVoice.__name__)"`
-- `.venv/bin/python -m py_compile demo/*.py`
+- `.venv/bin/python -m py_compile demo/*/*.py`
 - `.venv/bin/python -m tests.test_clearvoice_import`
 - 完整推理前确认对应中心模型目录存在。缺权重是环境限制，不是模块缺陷。
 

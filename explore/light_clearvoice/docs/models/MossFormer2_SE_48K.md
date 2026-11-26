@@ -27,8 +27,14 @@ PyTorch。网络类由 `clearvoice.network_wrapper` 按 task/model 加载。
 
 ```python
 from clearvoice import ClearVoice
-cv = ClearVoice(task="speech_enhancement", model_names=["MossFormer2_SE_48K"])
+cv = ClearVoice(task="speech_enhancement", model_names=["MossFormer2_SE_48K"], device="cuda:0")  # 或 "cpu" / "mps"
 ```
+
+## 硬件实测（`input.wav`，16 kHz / 2.398 s）
+
+- Colab CPU（AMD EPYC 7B12 2 vCPU，PyTorch 2.15.0+cpu）：单文件 `1.509 s`（RTF `0.6295`，`1.59x`）；`demo_Numpy2Numpy.py` `1.750 s`（RTF `0.7300`）。
+- Apple M4 Pro MPS（PyTorch 2.13.0）：冷启动 `0.785 s` / 稳态 `0.103 s`（RTF `0.0428`，`23.34x`），与 CPU 最大误差 `3.63e-04`，无 NaN。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，`cuda:0`）：冷启动 `0.696 s` / 稳态 `0.148 s`（RTF `0.0618`，`16.17x`）；峰值显存 `allocated=350.5 MiB, reserved=398.0 MiB`。
 
 ## 推理 API
 

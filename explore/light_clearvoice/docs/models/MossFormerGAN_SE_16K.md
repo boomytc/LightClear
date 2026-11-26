@@ -27,8 +27,13 @@ PyTorch。
 
 ```python
 from clearvoice import ClearVoice
-cv = ClearVoice(task="speech_enhancement", model_names=["MossFormerGAN_SE_16K"])
+cv = ClearVoice(task="speech_enhancement", model_names=["MossFormerGAN_SE_16K"], device="cuda:0")
 ```
+
+## 硬件实测（`test.wav`，48 kHz / 4.003 s）
+
+- CPU / Apple Silicon MPS：实测单文件 CPU 约 `26.5 s`（RTF `6.6`），MPS 虽单文件 `1.18 s` 但全量目录批处理超 9 分钟且显存需求高，均不具备产品部署性价比，仅保留 `demo/cuda/`。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，`cuda:0`）：冷启动 `1.493 s` / 稳态 `0.604 s`（RTF `0.1509`，`6.63x`）；目录批处理 `69.600 s`；峰值显存 `allocated=4461.1 MiB, reserved=7830.0 MiB`。
 
 ## 未验证/待确认
 

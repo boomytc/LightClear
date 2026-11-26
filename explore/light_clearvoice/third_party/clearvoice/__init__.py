@@ -13,7 +13,7 @@ class ClearVoice:
     """ The main class inferface to the end users for performing speech processing
         this class provides the desired model to perform the given task
     """
-    def __init__(self, task, model_names):
+    def __init__(self, task, model_names, device=None, checkpoint_dir=None):
         """ Load the desired models for the specified task. Perform all the given models and return all results.
    
         Parameters:
@@ -30,6 +30,10 @@ class ClearVoice:
             'MossFormerGAN_SE_16K'
             'MossFormer2_SS_16K'
             'AV_MossFormer2_TSE_16K'
+        device: str or torch.device, optional
+            Explicit device override ('cpu', 'mps', 'cuda', 'cuda:0', ...).
+        checkpoint_dir: str or Path or dict, optional
+            Explicit checkpoint directory override (or mapping {model_name: path}).
 
         Returns:
         --------
@@ -38,7 +42,12 @@ class ClearVoice:
         self.network_wrapper = network_wrapper()
         self.models = []
         for model_name in model_names:
-            model = self.network_wrapper(task, model_name)
+            model = self.network_wrapper(
+                task,
+                model_name,
+                device=device,
+                checkpoint_dir=checkpoint_dir,
+            )
             self.models += [model]  
             
     def __call__(self, input_path, online_write=False, output_path=None):

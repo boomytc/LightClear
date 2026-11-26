@@ -10,8 +10,21 @@ import torch.nn as nn
 import numpy as np
 import os 
 import sys
+from pathlib import Path
 import librosa
 import mimetypes
+
+
+def _resolve_scp_entry(scp_path, raw_path):
+    if os.path.exists(raw_path):
+        return raw_path
+    marker = "/assets/"
+    if marker in raw_path:
+        rel_assets = raw_path.split(marker, 1)[1]
+        candidate = Path(scp_path).resolve().parents[1] / rel_assets
+        if candidate.exists():
+            return str(candidate)
+    return raw_path
 
 def get_file_extension(file_path):
     """
@@ -76,7 +89,8 @@ def read_and_config_file(args, input_path, decode=0):
                         with open(input_path) as fid:
                             for line in fid:
                                 path_s = line.strip().split()  # Split paths (space-separated)
-                                processed_list.append(path_s[0])  # Add the first path (input audio path)
+                                if path_s:
+                                    processed_list.append(_resolve_scp_entry(input_path, path_s[0]))  # Add the first path (input audio path)
                 return processed_list
 
         # If decode is True, find audio files in a directory or single file
@@ -93,7 +107,8 @@ def read_and_config_file(args, input_path, decode=0):
                 with open(input_path) as fid:
                     for line in fid:
                         path_s = line.strip().split()  # Split paths (space-separated)
-                        processed_list.append(path_s[0])  # Add the first path (input audio path)
+                        if path_s:
+                            processed_list.append(_resolve_scp_entry(input_path, path_s[0]))  # Add the first path (input audio path)
         return processed_list
 
     # If decode is False, treat the input file as a configuration file

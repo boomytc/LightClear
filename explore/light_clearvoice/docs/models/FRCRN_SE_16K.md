@@ -27,8 +27,14 @@ PyTorch。
 
 ```python
 from clearvoice import ClearVoice
-cv = ClearVoice(task="speech_enhancement", model_names=["FRCRN_SE_16K"])
+cv = ClearVoice(task="speech_enhancement", model_names=["FRCRN_SE_16K"], device="cuda:0")  # 或 "cpu"
 ```
+
+## 硬件实测（`input.wav`，16 kHz / 2.398 s）
+
+- Colab CPU（AMD EPYC 7B12 2 vCPU，PyTorch 2.15.0+cpu）：单文件 `7.981 s`（RTF `3.3285`，`0.30x`）；Apple M4 Pro CPU 单文件约 `2.66 s`。
+- Apple M4 Pro MPS（PyTorch 2.13.0）：实测单文件稳态 `4.20 s`（复数循环算子同步开销大，**反慢于本机 CPU**，批处理超 8 分钟），因此不保留 `demo/mps/` 示例。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，`cuda:0`）：冷启动 `0.429 s` / 稳态 `0.103 s`（RTF `0.0428`，`23.35x`）；峰值显存 `allocated=1341.7 MiB, reserved=3450.0 MiB`。
 
 ## 推理 API
 

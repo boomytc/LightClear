@@ -52,8 +52,28 @@ class SpeechModel:
         Args:
         - args: Argument parser object containing settings like whether to use CUDA (GPU) or not.
         """
+        requested_device = getattr(args, "device", None)
+        if requested_device is not None:
+            target = torch.device(requested_device)
+            if target.type == "cuda":
+                if not torch.cuda.is_available():
+                    raise RuntimeError(f"请求设备 '{target}' 失败：当前环境 CUDA 不可用")
+                gpu_idx = 0 if target.index is None else target.index
+                torch.cuda.set_device(gpu_idx)
+                args.use_cuda = 1
+                self.device = torch.device(f"cuda:{gpu_idx}")
+            elif target.type == "mps":
+                if not mps.is_available():
+                    raise RuntimeError(f"请求设备 '{target}' 失败：当前环境 MPS 不可用")
+                args.use_cuda = 1
+                self.device = torch.device("mps")
+            elif target.type == "cpu":
+                args.use_cuda = 0
+                self.device = torch.device("cpu")
+            else:
+                raise ValueError(f"不支持的设备类型: {requested_device!r}")
         # Check if mps is available
-        if mps.is_available():
+        elif mps.is_available():
             args.use_cuda = 1
             self.device = torch.device('cpu') #torch.device('mps')
         # Check if a GPU is available
@@ -63,7 +83,7 @@ class SpeechModel:
             if free_gpu_id is not None:
                 args.use_cuda = 1
                 torch.cuda.set_device(free_gpu_id)
-                self.device = torch.device('cuda')
+                self.device = torch.device(f'cuda:{free_gpu_id}')
             else:
                 # If no GPU is detected, use the CPU
                 #print("No GPU found. Using CPU.")
@@ -141,10 +161,9 @@ class SpeechModel:
         best_name = os.path.join(self.args.checkpoint_dir, 'last_best_checkpoint')
         # Check if the last best checkpoint exists
         if not os.path.isfile(best_name):
-            if not self.download_model(self.name):
-                # If downloading is unsuccessful
-                print(f'Warning: Downloading model {self.name} is not successful. Please try again or manually download from https://huggingface.co/alibabasglab/{self.name}/tree/main !')
-                return
+            raise FileNotFoundError(
+                f"模型权重缺失: {best_name}（可通过 checkpoint_dir 或 LIGHTCLEAR_MODEL_ROOT 指定中心模型目录）"
+            )
 
         if isinstance(self.model, nn.ModuleList):
             with open(best_name, 'r') as f:

@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import yamlargparse
 import torch.nn as nn
 from pathlib import Path
@@ -170,7 +171,7 @@ class network_wrapper(nn.Module):
         # Parse arguments from the config file
         self.args = parser.parse_args(['--config', str(self.config_path)])
 
-    def __call__(self, task, model_name):
+    def __call__(self, task, model_name, device=None, checkpoint_dir=None):
         """
         Calls the appropriate argument-loading function based on the task type 
         (e.g., 'speech_enhancement', 'speech_separation', or 'target_speaker_extraction').
@@ -179,6 +180,8 @@ class network_wrapper(nn.Module):
         Args:
         - task (str): The task type ('speech_enhancement', 'speech_separation', 'target_speaker_extraction').
         - model_name (str): The name of the model to load (e.g., 'FRCRN_SE_16K').
+        - device (str | torch.device | None): Optional explicit compute device override.
+        - checkpoint_dir (str | Path | dict | None): Optional explicit checkpoint directory override.
         
         Returns:
         - self.network: The instantiated neural network model.
@@ -204,6 +207,19 @@ class network_wrapper(nn.Module):
         #print(self.args)  # Display the parsed arguments
         self.args.task = task 
         self.args.network = self.model_name  # Set the network name to the model name
+        self.args.device = device
+        if checkpoint_dir is not None:
+            if isinstance(checkpoint_dir, dict):
+                if model_name in checkpoint_dir:
+                    self.args.checkpoint_dir = str(checkpoint_dir[model_name])
+            else:
+                self.args.checkpoint_dir = str(checkpoint_dir)
+        else:
+            model_root = os.environ.get("LIGHTCLEAR_MODEL_ROOT")
+            default_prefix = "/Users/boom/Model/"
+            if model_root and str(self.args.checkpoint_dir).startswith(default_prefix):
+                rel_ckpt = str(self.args.checkpoint_dir)[len(default_prefix):]
+                self.args.checkpoint_dir = str(Path(model_root) / rel_ckpt)
 
         # Initialize the corresponding network based on the selected model
         if self.args.network == 'FRCRN_SE_16K':
