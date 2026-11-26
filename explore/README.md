@@ -25,21 +25,21 @@
 
 ## 从哪进
 
-所有探索模块的 `demo/` 均按硬件拆分为 `demo/cpu/`、`demo/mps/`、`demo/cuda/`，脚本底部附真实硬件实测输出注释。从仓库根目录：
+所有探索模块的 `demo/` 均按能力平铺为单文件顶层脚本，顶部通过全局 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 指定设备（支持 MPS 的模型走 `cuda > mps > cpu`，不支持 MPS 的模型走 `cuda > cpu`，目标加速器不可用时打印警告并自动回退 `cpu`），脚本底部并列附各硬件真实实测输出注释。从仓库根目录：
 
 ```bash
 cd explore/light_clearvoice
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/cpu/demo_se.py    # 或 demo/mps/demo_se.py / demo/cuda/demo_se.py
+.venv/bin/python demo/demo_se.py              # 可用 LIGHTCLEAR_DEVICE=cpu/mps/cuda:0 覆盖
 
 cd ../light_demucs
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/cpu/demo_vocals.py  # 或 demo/mps/demo_vocals.py / demo/cuda/demo_vocals.py
+.venv/bin/python demo/demo_vocals.py          # 可用 LIGHTCLEAR_DEVICE=cpu/mps/cuda:0 覆盖
 
 cd ../light_voice_isolator
 uv venv --python 3.12
 uv pip install -e .
-.venv/bin/python demo/mps/demo_offline_single.py  # 或 demo/cuda/demo_offline_single.py
+.venv/bin/python demo/demo_offline_single.py  # 可用 LIGHTCLEAR_DEVICE=mps/cuda:0/cpu 覆盖
 ```

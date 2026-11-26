@@ -30,13 +30,13 @@
 ## Layout
 
 - `third_party/`：模块本地 vendored runtime。
-- `demo/`：直接能力示例，按硬件拆分为 `demo/cpu/`、`demo/mps/`、`demo/cuda/`（仅保留对应硬件实测可用的脚本，允许各硬件目录脚本数按实际适配不对等），单文件顶层脚本。
+- `demo/`：按能力平铺的直接能力示例（单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备并按模型实测适配决定是否启用 MPS，目标加速器不可用时警告并回退 `cpu`。
 - `docs/models/`：按模型维护的文档。
 - `outputs/`：运行产物，可清理。
 
 ## Demo 脚本规范
 
-- `demo/{cpu,mps,cuda}/` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
-- 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 实测输出注释。
-- 关键路径、模型名、任务名、设备名、输入文件、输出路径、采样率使用全局变量放在文件顶部；样例路径通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `/Users/boom/Model`）。
-- 要体现该模块公共入口的真实使用方式，不把核心逻辑藏到包装层；目标硬件不可用时显式抛错，不静默回退。
+- `demo/demo_*.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
+- 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
+- 关键路径、模型名、任务名、设备名（`DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")`）、输入文件、输出路径、采样率使用全局变量放在文件顶部；样例路径通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `/Users/boom/Model`）。
+- 要体现该模块公共入口的真实使用方式，不把核心逻辑藏到包装层；支持 MPS 的模型 `auto` 走 `cuda > mps > cpu`，不支持 MPS 的模型 `auto` 走 `cuda > cpu`；目标加速器不可用（或不支持 MPS 的模型指定 `mps`）时打印明确警告并回退 `cpu`；缺权重或无效 `DEVICE` 值仍显式抛错。
