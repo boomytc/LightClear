@@ -7,7 +7,7 @@ from pathlib import Path
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 IMPORT_LINE = "from inworld import voice_isolation"
-MODEL_DIR = Path("/Users/boom/Model/SE/inworld-voice-isolator")
+REQUIRED_BACKENDS = ("mps", "cuda")
 REQUIRED_DEMOS = {
     "demo_offline_single.py",
     "demo_offline_options.py",
@@ -15,6 +15,10 @@ REQUIRED_DEMOS = {
     "demo_streaming_realtime.py",
     "demo_streaming_knobs.py",
     "demo_lowlevel_network.py",
+}
+EXPECTED_DEVICE_LITERALS = {
+    "mps": 'DEVICE = "mps"',
+    "cuda": 'DEVICE = "cuda:0"',
 }
 
 
@@ -53,27 +57,40 @@ def check_missing_checkpoint_fails_fast() -> None:
 
 def compile_demos() -> list[str]:
     demo_dir = MODULE_ROOT / "demo"
-    demo_files = sorted(demo_dir.glob("demo_*.py"))
-    if not demo_files:
-        raise AssertionError(f"no demo scripts in {demo_dir}")
+    stray_top = sorted(demo_dir.glob("demo_*.py"))
+    if stray_top:
+        raise AssertionError(f"unexpected top-level demos in {demo_dir}: {[p.name for p in stray_top]}")
+    if (demo_dir / "cpu").exists():
+        raise AssertionError("light_voice_isolator omits demo/cpu/ because CPU RTF > 4x/11x is impractical")
+
     names: list[str] = []
-    for path in demo_files:
-        py_compile.compile(str(path), doraise=True)
-        text = path.read_text(encoding="utf-8")
-        names.append(path.name)
-        if IMPORT_LINE not in text:
-            raise AssertionError(f"{path.name} missing {IMPORT_LINE!r}")
-        tree = ast.parse(text, filename=str(path))
-        for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                raise AssertionError(
-                    f"{path.name} must not define functions (found {node.name!r})"
-                )
-        if str(MODEL_DIR) not in text:
-            raise AssertionError(f"{path.name} must reference central weights dir {MODEL_DIR}")
-    missing = sorted(REQUIRED_DEMOS.difference(names))
-    if missing:
-        raise AssertionError(f"missing demo scripts: {missing}")
+    for backend in REQUIRED_BACKENDS:
+        backend_dir = demo_dir / backend
+        demo_files = sorted(backend_dir.glob("demo_*.py"))
+        if not demo_files:
+            raise AssertionError(f"no demo scripts in {backend_dir}")
+        backend_names: set[str] = set()
+        for path in demo_files:
+            py_compile.compile(str(path), doraise=True)
+            text = path.read_text(encoding="utf-8")
+            rel_name = f"{backend}/{path.name}"
+            names.append(rel_name)
+            backend_names.add(path.name)
+            if IMPORT_LINE not in text:
+                raise AssertionError(f"{rel_name} missing {IMPORT_LINE!r}")
+            if EXPECTED_DEVICE_LITERALS[backend] not in text:
+                raise AssertionError(f"{rel_name} must pin {EXPECTED_DEVICE_LITERALS[backend]!r}")
+            if "LIGHTCLEAR_MODEL_ROOT" not in text or "inworld-voice-isolator" not in text:
+                raise AssertionError(f"{rel_name} must resolve central weights via LIGHTCLEAR_MODEL_ROOT")
+            tree = ast.parse(text, filename=str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    raise AssertionError(
+                        f"{rel_name} must not define functions (found {node.name!r})"
+                    )
+        missing = sorted(REQUIRED_DEMOS.difference(backend_names))
+        if missing:
+            raise AssertionError(f"missing {backend} demo scripts: {missing}")
     return names
 
 
@@ -82,6 +99,7 @@ def main() -> None:
     check_missing_checkpoint_fails_fast()
     demos = compile_demos()
     print(f"import_name={name}")
+    print(f"demo_count={len(demos)}")
     print("demos=" + ",".join(demos))
 
 
