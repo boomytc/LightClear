@@ -12,7 +12,7 @@
 - 创建并使用本目录内的 `.venv`：`uv venv --python 3.12`。
 - 运行优先使用 `.venv/bin/python`。
 - 安装：`uv pip install -e .`。
-- macOS 或无 NVIDIA GPU 按 CPU 链路验证；不要默认假设 CUDA 可用。
+- 无 NVIDIA GPU 环境下不要默认假设 CUDA 可用；本模块全部模型支持 `cuda > mps > cpu` 自动选择（Apple Silicon 默认走 MPS，无加速器时警告并回退 CPU）。
 
 ## Layout
 
@@ -46,5 +46,5 @@
 ## Demo 脚本规范
 
 - `demo` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
-- 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出。
+- 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
 - 关键路径使用全局变量放在文件顶部。

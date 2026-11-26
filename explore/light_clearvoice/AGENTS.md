@@ -12,17 +12,17 @@
 - 创建并使用本目录内的 `.venv`：`uv venv --python 3.12`。
 - 运行优先使用 `.venv/bin/python`。
 - 安装：`uv pip install -e .`。
-- macOS 或无 NVIDIA GPU 按 CPU 链路验证；不要默认假设 CUDA 可用。
+- 无 NVIDIA GPU 环境下不要默认假设 CUDA 可用；支持 MPS 的模型（`MossFormer2_SE_48K` / `MossFormer2_SR_48K` / `MossFormer2_SS_16K`）在 Apple Silicon 上默认走 MPS，其余模型走 CPU，目标加速器不可用时警告并回退 CPU。
 
 ## Layout
 
 - Python 包源码位于 `third_party/clearvoice`，公共入口是 `from clearvoice import ClearVoice`。
 - 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`。本模块不保留本地 `models/` 权重目录。
-- 中心模型目录：
-  - SE / TSE：`/Users/boom/Model/SE/<ModelName>`
-  - SS：`/Users/boom/Model/SS/<ModelName>`
-  - SR：`/Users/boom/Model/SR/<ModelName>`
-- 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 必须与中心目录约定一致。yaml 里的 `input_path` / `output_dir` 只是配置占位，真正输入输出由 `ClearVoice(...)` 调用参数决定。
+- 中心模型目录（默认 `~/Model`，本机即 `/Users/boom/Model`，支持 `LIGHTCLEAR_MODEL_ROOT` 覆盖）：
+  - SE / TSE：`~/Model/SE/<ModelName>`
+  - SS：`~/Model/SS/<ModelName>`
+  - SR：`~/Model/SR/<ModelName>`
+- 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 默认指向 `~/Model/...` 并由 `network_wrapper.py` 按 `LIGHTCLEAR_MODEL_ROOT` 或 `Path.home() / "Model"` 展开。yaml 里的 `input_path` / `output_dir` 只是配置占位，真正输入输出由 `ClearVoice(...)` 调用参数决定。
 - 共享样例使用仓库根 `assets/`（demo 通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台解析，`.scp` 清单在 `dataloader/misc.py` 内自动做跨平台路径映射）。不要在本模块再拷一份共享 wav。
 - Demo 按能力平铺在 `demo/` 下（8 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（支持 MPS 的模型走 `cuda > mps > cpu`，不支持 MPS 的模型走 `cuda > cpu`，目标加速器不可用时警告并回退 `cpu`）；`ClearVoice(...)` 已支持可选 `device` 与 `checkpoint_dir` 参数及 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `~/Model`，本机即 `/Users/boom/Model`）。输出按实际设备写入本模块 `outputs/{cpu,mps,cuda}/`。
 - 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。
@@ -53,5 +53,5 @@
 ## Demo 脚本规范
 
 - `demo` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
-- 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出。
+- 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
 - 关键路径使用全局变量放在文件顶部。

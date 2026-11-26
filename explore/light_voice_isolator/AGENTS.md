@@ -18,7 +18,7 @@
 
 - Python 包源码位于 `third_party/inworld/voice_isolation`（隐式命名空间包 `inworld`），公共入口是 `from inworld import voice_isolation`。
 - `third_party/inworld` 是上游 `inworld-ai/voice-isolator` v1.0.0（commit `c73b3fab81a870410cbac50d2f05f25edc4d10aa`，Apache-2.0）的 vendor 副本，并保留 `third_party/LICENSE` 与 `third_party/NOTICE`。允许在本模块副本上做必要修改，官方更新后单独判断是否同步，不要自动覆盖。
-- 中心模型权重目录：`/Users/boom/Model/SE/inworld-voice-isolator/`，不纳入版本库，也不在 demo 中静默联网自动下载：
+- 中心模型权重目录：默认 `~/Model/SE/inworld-voice-isolator/`（本机即 `/Users/boom/Model/SE/inworld-voice-isolator/`，支持 `LIGHTCLEAR_MODEL_ROOT` 覆盖），不纳入版本库，也不在 demo 中静默联网自动下载：
   - `denoiser.safetensors`（离线 `voice-isolator-v1`，64.05M）
   - `denoiser_realtime.safetensors`（流式 `voice-isolator-v1-realtime`，58.18M）
 - 模型索引见 `docs/模型列表.md`；完整模型规格、能力边界与实测数据见 `docs/models/inworld-voice-isolator.md`。
@@ -28,9 +28,9 @@
 ## Runtime Rules
 
 - 入口脚本如果直接 `import inworld`，先注入本模块 `third_party/`。
-- 所有 demo 与本地调用必须显式传入 `/Users/boom/Model/SE/inworld-voice-isolator/` 下的本地 `.safetensors` 路径，不要传入 `"inworld/voice-isolator"` 触发静默 Hugging Face 联网下载。
+- 所有 demo 与本地调用必须显式传入本地 `.safetensors` 路径（默认在 `~/Model/SE/inworld-voice-isolator/` 或 `LIGHTCLEAR_MODEL_ROOT` 指定目录下），不要传入 `"inworld/voice-isolator"` 触发静默 Hugging Face 联网下载。
 - 缺依赖、缺权重或路径错误必须显式暴露直接错误，不做隐式回退。
-- Apple Silicon `mps` 上保持默认 `precision="auto"`（自动走 `fp32`）；不要在 `mps` 上强开 `fp16`（实测出现 NaN 溢出），`bf16` 稳态略慢于 `fp32` 且无收益。
+- 无论 Apple Silicon `mps` 还是 NVIDIA `cuda`，统一保持默认 `precision="auto"`（MPS 自动走 `fp32`，CUDA 自动走 `bf16`）；不要强开 `fp16`（实测在 MPS 与 L4 CUDA 上均出现 NaN 溢出），MPS 上 `bf16` 也无速度收益。
 
 ## Validation
 
@@ -48,5 +48,5 @@
 ## Demo 脚本规范
 
 - `demo` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
-- 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出。
+- 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
 - 关键路径、权重路径、样例路径和输出路径使用全局变量放在文件顶部。

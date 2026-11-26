@@ -28,12 +28,12 @@
 - 创建环境：在目标目录执行 `uv venv --python 3.12`。
 - 依赖只安装到当前目录：`uv pip install -e .`。
 - 不要使用仓库根 `.venv` 运行模块或产品代码。
-- macOS 或无 NVIDIA GPU 按 CPU 链路验证。
+- 硬件验证口径：`explore/` 按各模型实测支持情况通过顶部 `DEVICE` 自动选择（支持 MPS 的模型在 Apple Silicon 上优先 MPS，不支持 MPS 的走 CPU，无加速器时警告回退 CPU；NVIDIA GPU / Colab 上验证 CUDA）；`products/` 当前默认按 CPU 链路验证。
 
 ## Refactor Rules
 
 - 保持 vendored runtime 在模块或产品本地 `third_party/`。
-- ClearVoice 与 Inworld Voice Isolator 中心模型目录：`/Users/boom/Model/{SE,SS,SR}/`（Voice Isolator 权重在 `/Users/boom/Model/SE/inworld-voice-isolator/`）。Demucs 权重各放在使用方自己的 `models/<model>/`（explore 按模型分子目录；`vocal_isolate_web` 装 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`，默认 `htdemucs`），运行时互不读取。缺权重直接失败，不要回退家庭缓存。以后若有第二个产品要用，再单独做指向。
+- ClearVoice 与 Inworld Voice Isolator 中心模型目录默认 `~/Model/{SE,SS,SR}/`（本机即 `/Users/boom/Model/...`，Voice Isolator 权重在 `~/Model/SE/inworld-voice-isolator/`，探索层均支持通过 `LIGHTCLEAR_MODEL_ROOT` 覆盖）。Demucs 权重各放在使用方自己的 `models/<model>/`（explore 按模型分子目录；`vocal_isolate_web` 装 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`，默认 `htdemucs`），运行时互不读取。缺权重直接失败，不要回退家庭缓存。以后若有第二个产品要用，再单独做指向。
 - 允许在当前模块 `third_party/` 上做该家族需要的上游修改。官方更新后单独判断是否同步，不要自动覆盖，也不要改兄弟模块的副本。优先在 demo 或产品层适配。
 - 缺依赖、缺模型或路径错误应显式暴露直接错误，不要回退到旧根路径。
 - 不要添加共享 SDK。产品按场景拆入口：同一场景可以有多件工具（`speech_clarity_web`）或同任务多档（`vocal_isolate_web`）。禁止跨场景引擎超市（ClearVoice + Demucs 同一目录页），禁止服务端万能管道，禁止把三个单工具 `speech_*_web` 合并成模型台。人声隔离不要接到任何 speech_* 产品。
@@ -41,7 +41,7 @@
 ## Demo 脚本规范
 
 - `demo` 下 `.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
-- 顺序：import → 全局关键参数 → 模型加载 → 输入构造 → 推理调用 → 结果输出。
+- 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
 - 公共入口以该模块 `AGENTS.md` 为准：`light_clearvoice` 用 `from clearvoice import ClearVoice`；`light_demucs` 用 `from demucs.api import Separator`；`light_voice_isolator` 用 `from inworld import voice_isolation`。
 
 ## Cleanup

@@ -82,8 +82,8 @@ LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_offline_single.py
 
 # 使用中心目录本地权重执行完整冒烟（离线 + 流式双轨各跑 0.5 s 静音，不联网下载）
 .venv/bin/voice-isolate-doctor --full \
-  --offline-model /Users/boom/Model/SE/inworld-voice-isolator/denoiser.safetensors \
-  --online-model /Users/boom/Model/SE/inworld-voice-isolator/denoiser_realtime.safetensors
+  --offline-model ~/Model/SE/inworld-voice-isolator/denoiser.safetensors \
+  --online-model ~/Model/SE/inworld-voice-isolator/denoiser_realtime.safetensors
 ```
 
 > 注：未传 `--offline-model`/`--online-model` 时，`--full` 会尝试从 Hugging Face 下载并校验缓存。在 LightClear 本地环境中建议显式传入本地权重路径。
@@ -93,23 +93,23 @@ LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_offline_single.py
 ```bash
 # 离线默认：输出 48 kHz float32 人声 + 同目录 <stem>_background.wav（可用 --background 指定残差路径）
 .venv/bin/voice-isolate \
-  /Users/boom/workspace/LightClear/assets/audio/noisy/input.wav \
+  ../../assets/audio/noisy/input.wav \
   outputs/cli/input_voice.wav \
-  --model /Users/boom/Model/SE/inworld-voice-isolator/denoiser.safetensors \
+  --model ~/Model/SE/inworld-voice-isolator/denoiser.safetensors \
   --background outputs/cli/input_bg.wav
 
 # 仅输出人声（默认 PCM_16 防削波）；加 --float32 保留 float32；--output-sr 0 保持原采样率（如 16 kHz）
 .venv/bin/voice-isolate \
-  /Users/boom/workspace/LightClear/assets/audio/noisy/input.wav \
+  ../../assets/audio/noisy/input.wav \
   outputs/cli/input_16k_float.wav \
-  --model /Users/boom/Model/SE/inworld-voice-isolator/denoiser.safetensors \
+  --model ~/Model/SE/inworld-voice-isolator/denoiser.safetensors \
   --no-background --float32 --output-sr 0
 
 # 流式模式（仅写人声，默认 PCM_16，lookahead=2 即 20 ms 前瞻）
 .venv/bin/voice-isolate \
-  /Users/boom/workspace/LightClear/assets/audio/noisy/input.wav \
+  ../../assets/audio/noisy/input.wav \
   outputs/cli/input_stream.wav \
-  --model /Users/boom/Model/SE/inworld-voice-isolator/denoiser_realtime.safetensors \
+  --model ~/Model/SE/inworld-voice-isolator/denoiser_realtime.safetensors \
   --mode streaming --lookahead 2
 ```
 
@@ -120,11 +120,11 @@ LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_offline_single.py
 ```bash
 # 2 个分片并发或分批处理
 .venv/bin/voice-isolate /path/to/in_dir outputs/cli_batch \
-  --model /Users/boom/Model/SE/inworld-voice-isolator/denoiser.safetensors \
+  --model ~/Model/SE/inworld-voice-isolator/denoiser.safetensors \
   --shard 0 --num-shards 2
 
 .venv/bin/voice-isolate /path/to/in_dir outputs/cli_batch \
-  --model /Users/boom/Model/SE/inworld-voice-isolator/denoiser.safetensors \
+  --model ~/Model/SE/inworld-voice-isolator/denoiser.safetensors \
   --shard 1 --num-shards 2
 
 # 重复运行同一分片会自动跳过已完成文件（打印 "N file(s), 0 to do"）
@@ -138,7 +138,7 @@ LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_offline_single.py
 .venv/bin/python -m tests.test_voice_isolator_import
 ```
 
-模型索引、完整规格、Apple M4 Pro 实测数据、能力边界与横向对比见：
+模型索引、完整规格、Apple M4 Pro（MPS / CPU）与 Colab NVIDIA L4（CUDA）实测数据、能力边界与横向对比见：
 
 - [`docs/模型列表.md`](./docs/模型列表.md)
 - [`docs/models/inworld-voice-isolator.md`](./docs/models/inworld-voice-isolator.md)

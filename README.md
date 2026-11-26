@@ -63,7 +63,7 @@ uv pip install -e .
 .venv/bin/python demo/demo_offline_single.py  # 默认 cuda > mps > cpu，底部并列附多硬件实测输出
 ```
 
-ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`；Inworld Voice Isolator 权重使用 `/Users/boom/Model/SE/inworld-voice-isolator/`。Demucs 权重放在各自模块/产品的 `models/<model>/`；产品 `vocal_isolate_web` 可装 `htdemucs`、`htdemucs_ft`、`htdemucs_6s`，默认 `htdemucs`。详见各模块 README。
+ClearVoice 权重默认位于 `~/Model/{SE,SS,SR}/`；Inworld Voice Isolator 权重默认位于 `~/Model/SE/inworld-voice-isolator/`（探索层均支持 `LIGHTCLEAR_MODEL_ROOT` 覆盖）。Demucs 权重放在各自模块/产品的 `models/<model>/`；产品 `vocal_isolate_web` 可装 `htdemucs`、`htdemucs_ft`、`htdemucs_6s`，默认 `htdemucs`。详见各模块 README。
 
 ## 产品
 
