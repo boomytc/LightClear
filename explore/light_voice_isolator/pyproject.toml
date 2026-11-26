@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "light-voice-isolator"
+version = "0.1.0"
+description = "Inworld Voice Isolator exploration family for 48 kHz offline and streaming voice isolation"
+requires-python = ">=3.10"
+dependencies = [
+  "huggingface-hub",
+  "numpy",
+  "safetensors",
+  "soundfile>=0.12.1",
+  "torch>=2.6",
+  "torchaudio>=2.6",
+]
+
+[project.scripts]
+voice-isolate = "inworld.voice_isolation.cli:main"
+voice-isolate-doctor = "inworld.voice_isolation.doctor:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["third_party"]
+include = ["inworld*"]
+namespaces = true

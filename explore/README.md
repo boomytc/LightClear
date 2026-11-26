@@ -9,6 +9,7 @@
 |------|----------|--------|--------------|--------|
 | [`light_clearvoice/`](./light_clearvoice/) | ClearVoice | SE / SS / SR / TSE 加载与推理 | 三个单工具 `speech_*_web` 与 `speech_clarity_web` 工作台各自自持一份 ClearVoice | Demucs 运行时、把三个 WebUI 合成引擎超市 |
 | [`light_demucs/`](./light_demucs/) | Demucs | 人声隔离、四轨、`htdemucs_ft` 质量档、六轨；`Separator` API | `vocal_isolate_web` 自持一份 Demucs，默认四轨，可选质量档与六轨 | ClearVoice 说话人分离、`speech_separation_web` |
+| [`light_voice_isolator/`](./light_voice_isolator/) | Inworld Voice Isolator | 48 kHz 离线与因果低延迟流式语音隔离、`VoiceIsolator` / `Stream` / CLI / MPS Metal Shader | 独立探索模块（当前不改动 `products/`） | 带宽修复/超分（`MossFormer2_SR_48K`）、双人分轨（`MossFormer2_SS_16K`）或歌曲多轨分离（Demucs） |
 
 新上游家族开新的 `light_*`，不要按任务拆 ClearVoice，也不要折进兄弟目录。
 
@@ -36,4 +37,9 @@ cd ../light_demucs
 uv venv --python 3.12
 uv pip install -e .
 .venv/bin/python demo/demo_vocals.py
+
+cd ../light_voice_isolator
+uv venv --python 3.12
+uv pip install -e .
+.venv/bin/python demo/demo_offline_single.py
 ```

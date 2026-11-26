@@ -8,6 +8,7 @@ LightClear 是音频变清晰工作区。把带噪、混合、带限或叠乐的
 | --- | --- | --- |
 | `explore/light_clearvoice` | `from clearvoice import ClearVoice` | 语音增强、说话人分离、超分、目标说话人提取 |
 | `explore/light_demucs` | `from demucs.api import Separator` | 人声隔离、四轨 / 六轨分轨 |
+| `explore/light_voice_isolator` | `from inworld import voice_isolation` | 48 kHz 离线与因果实时流式人声隔离（Denoising） |
 
 ## 目录
 
@@ -16,7 +17,8 @@ LightClear/
 ├── assets/                         # explore 共享样例池
 ├── explore/
 │   ├── light_clearvoice/           # ClearVoice 家族
-│   └── light_demucs/               # Demucs 家族
+│   ├── light_demucs/               # Demucs 家族
+│   └── light_voice_isolator/       # Inworld Voice Isolator 家族
 ├── products/
 │   ├── speech_clarity_web/
 │   ├── speech_enhance_web/
@@ -32,6 +34,7 @@ LightClear/
 | --- | --- |
 | `explore/light_clearvoice/` | ClearVoice 运行时、demo、模型文档。 |
 | `explore/light_demucs/` | Demucs 运行时、demo、模型文档。vendor 在模块 `third_party/demucs`。 |
+| `explore/light_voice_isolator/` | Inworld Voice Isolator 运行时、6 个聚焦 demo、CLI 与模型边界实测文档。vendor 在模块 `third_party/inworld`。 |
 | `assets/` | explore 共享样例；产品运行时不得读取。 |
 | `products/speech_clarity_web/` | 语音清晰工作台：增强 / 分离 / 超分可独立调用，客户端按需串联。 |
 | `products/speech_enhance_web/` | 语音增强单工具 WebUI，默认 `MossFormer2_SE_48K`。 |
@@ -53,9 +56,14 @@ cd ../light_demucs
 uv venv --python 3.12
 uv pip install -e .
 .venv/bin/python demo/demo_vocals.py
+
+cd ../light_voice_isolator
+uv venv --python 3.12
+uv pip install -e .
+.venv/bin/python demo/demo_offline_single.py
 ```
 
-ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`。Demucs 权重放在各自模块/产品的 `models/<model>/`；产品 `vocal_isolate_web` 可装 `htdemucs`、`htdemucs_ft`、`htdemucs_6s`，默认 `htdemucs`。详见各模块 README。
+ClearVoice 权重使用 `/Users/boom/Model/{SE,SS,SR}/`；Inworld Voice Isolator 权重使用 `/Users/boom/Model/SE/inworld-voice-isolator/`。Demucs 权重放在各自模块/产品的 `models/<model>/`；产品 `vocal_isolate_web` 可装 `htdemucs`、`htdemucs_ft`、`htdemucs_6s`，默认 `htdemucs`。详见各模块 README。
 
 ## 产品
 
@@ -80,6 +88,10 @@ cd explore/light_clearvoice
 cd ../light_demucs
 .venv/bin/python -c "from demucs.api import Separator; print(Separator.__name__)"
 .venv/bin/python -m tests.test_demucs_import
+
+cd ../light_voice_isolator
+.venv/bin/python -c "from inworld import voice_isolation; print(voice_isolation.VoiceIsolator.__name__)"
+.venv/bin/python -m tests.test_voice_isolator_import
 
 cd ../../products/speech_clarity_web
 .venv/bin/python -m tests.test_health
