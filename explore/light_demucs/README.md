@@ -27,26 +27,19 @@ uv pip install -e .
 
 ## Demo
 
-按硬件分为 `demo/cpu/`、`demo/mps/`、`demo/cuda/` 三个子目录（均实测支持且数值与 CPU 对齐，`shifts=0` 时 MPS vs CPU `max_diff <= 1.1e-5`）。从本模块目录运行：
+4 个能力脚本平铺在 `demo/` 下，均实测支持 CUDA / MPS / CPU（数值与 CPU 对齐，`shifts=0` 时 MPS vs CPU `max_diff <= 1.1e-5`）。顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`），底部并列附三种硬件实测输出。从本模块目录运行：
 
 ```bash
-# CPU（通用基线）
-.venv/bin/python demo/cpu/demo_vocals.py
-.venv/bin/python demo/cpu/demo_stems.py
-.venv/bin/python demo/cpu/demo_htdemucs_ft.py
-.venv/bin/python demo/cpu/demo_htdemucs_6s.py
+# 默认自动选择最优可用设备（cuda > mps > cpu）
+.venv/bin/python demo/demo_vocals.py
+.venv/bin/python demo/demo_stems.py
+.venv/bin/python demo/demo_htdemucs_ft.py
+.venv/bin/python demo/demo_htdemucs_6s.py
 
-# Apple Silicon MPS（需 macOS arm64，自动在复杂 STFT 回退 CPU 其余走 MPS）
-.venv/bin/python demo/mps/demo_vocals.py
-.venv/bin/python demo/mps/demo_stems.py
-.venv/bin/python demo/mps/demo_htdemucs_ft.py
-.venv/bin/python demo/mps/demo_htdemucs_6s.py
-
-# NVIDIA CUDA（需 NVIDIA GPU，显式使用 cuda:0，含冷启动/稳态与峰值显存统计）
-.venv/bin/python demo/cuda/demo_vocals.py
-.venv/bin/python demo/cuda/demo_stems.py
-.venv/bin/python demo/cuda/demo_htdemucs_ft.py
-.venv/bin/python demo/cuda/demo_htdemucs_6s.py
+# 按需通过环境变量或直接修改脚本顶部 DEVICE 指定设备
+LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_vocals.py
+LIGHTCLEAR_DEVICE=mps .venv/bin/python demo/demo_vocals.py
+LIGHTCLEAR_DEVICE=cuda:0 .venv/bin/python demo/demo_vocals.py
 ```
 
 ### 实测耗时速览（`next_station_heaven.mp3`，30.041 s，`shifts=1, segment=7`）

@@ -21,7 +21,7 @@
 - 模型索引见 `docs/模型列表.md`；各模型文档在 `docs/models/`；参数调优与导出见 `docs/参数调优与音频导出.md`。
 - 权重目录：本模块 `models/<model>/`，不进版本库。安装：`.venv/bin/python scripts/install_model.py <htdemucs|htdemucs_ft|htdemucs_6s>`。缺目录直接失败。不要写家庭缓存，不要安装时自动拷进产品。产品要权重时自己指定模型名和目标目录再装一份。
 - 共享样例使用仓库根 `assets/audio/music/`（demo 通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台解析，避免触发 `parents[3]` 布局限制）。不要在本模块再拷一份共享音频。
-- Demo 按硬件分为 `demo/cpu/`、`demo/mps/`、`demo/cuda/`。输出按硬件写入本模块 `outputs/{cpu,mps,cuda}/`。
+- Demo 按能力平铺在 `demo/` 下（4 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`）。输出按实际设备写入本模块 `outputs/{cpu,mps,cuda}/`。
 - 稳定产品入口是 `../../products/vocal_isolate_web/`。不要在本模块内新增产品运行时代码。不要接到 `speech_separation_web`（那是说话人分离，不是分轨）。产品可选 `htdemucs` / `htdemucs_ft` / `htdemucs_6s`，默认仍是 `htdemucs`。
 
 ## Runtime Rules
@@ -34,7 +34,7 @@
 ## Validation
 
 - `.venv/bin/python -c "from demucs.api import Separator; print(Separator.__name__)"`
-- `.venv/bin/python -m py_compile demo/*/*.py`
+- `.venv/bin/python -m py_compile demo/demo_*.py`
 - `.venv/bin/python -m tests.test_demucs_import`
 - 完整推理前确认对应 `models/<model>/` 存在。缺权重是环境限制，不是模块缺陷。
 
