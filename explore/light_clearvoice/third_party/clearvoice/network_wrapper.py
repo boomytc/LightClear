@@ -215,11 +215,13 @@ class network_wrapper(nn.Module):
             else:
                 self.args.checkpoint_dir = str(checkpoint_dir)
         else:
-            model_root = os.environ.get("LIGHTCLEAR_MODEL_ROOT")
-            default_prefix = "/Users/boom/Model/"
-            if model_root and str(self.args.checkpoint_dir).startswith(default_prefix):
-                rel_ckpt = str(self.args.checkpoint_dir)[len(default_prefix):]
-                self.args.checkpoint_dir = str(Path(model_root) / rel_ckpt)
+            default_model_root = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT") or (Path.home() / "Model"))
+            raw_ckpt = str(self.args.checkpoint_dir)
+            for prefix in ("~/Model/", "/Users/boom/Model/"):
+                if raw_ckpt.startswith(prefix):
+                    rel_ckpt = raw_ckpt[len(prefix):]
+                    self.args.checkpoint_dir = str(default_model_root / rel_ckpt)
+                    break
 
         # Initialize the corresponding network based on the selected model
         if self.args.network == 'FRCRN_SE_16K':

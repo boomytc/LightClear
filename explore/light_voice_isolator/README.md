@@ -40,7 +40,7 @@ shasum -a 256 /Users/boom/Model/SE/inworld-voice-isolator/*.safetensors
 
 ## 6 组聚焦 Demo（按能力平铺，顶部 `DEVICE` 自动选择 `cuda > mps > cpu`）
 
-所有 demo 均为单文件顶层顺序脚本，平铺在 `demo/` 下。顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`），样例路径由 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心模型根目录支持 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `/Users/boom/Model`），输出按实际设备写入本模块 `outputs/{cuda,mps,cpu}/`，脚本底部并列附 L4 CUDA 与 M4 Pro MPS 实测输出。
+所有 demo 均为单文件顶层顺序脚本，平铺在 `demo/` 下。顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`），样例路径由 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心模型根目录支持 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `~/Model`，本机即 `/Users/boom/Model`），输出按实际设备写入本模块 `outputs/{cuda,mps,cpu}/`，脚本底部并列附 L4 CUDA 与 M4 Pro MPS 实测输出。
 
 > 说明：本模块落到 CPU 运行时会打印性能警告并自动在 macOS 上限 2 线程——实测即使限 2 线程，Apple M4 Pro CPU 离线 RTF 仍达 `4.31`、20 ms 流式 RTF 达 `11.18`（不可实时），仅作无加速器兜底；生产建议使用 MPS（自带编译 Metal Shader）或 NVIDIA CUDA。详细对比见 `demo/demo_offline_options.py` 第 5 节与 [`docs/models/inworld-voice-isolator.md`](./docs/models/inworld-voice-isolator.md)。
 

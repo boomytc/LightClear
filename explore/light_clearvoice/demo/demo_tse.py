@@ -19,7 +19,7 @@ from clearvoice import ClearVoice
 DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")  # 可选: "auto" / "cuda" / "cuda:0" / "cpu"（不支持 MPS，指定 mps 将回退到 cpu）
 TASK_NAME = "target_speaker_extraction"
 MODEL_NAME = "AV_MossFormer2_TSE_16K"
-MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT", "/Users/boom/Model"))
+MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT") or (Path.home() / "Model"))
 CHECKPOINT_DIR = MODEL_ROOT / "SE" / MODEL_NAME
 INPUT_VIDEO = REPO_ROOT / "assets" / "video" / "speech" / "001.avi"
 INPUT_VIDEO_DIR = REPO_ROOT / "assets" / "video" / "speech"

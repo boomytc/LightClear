@@ -4,7 +4,7 @@ use_cuda: 1 # 1 for True, 0 for False
 num_gpu: 1
 sampling_rate: 16000
 network: "MossFormerGAN_SE_16K"  ##network type
-checkpoint_dir: "/Users/boom/Model/SE/MossFormerGAN_SE_16K"
+checkpoint_dir: "~/Model/SE/MossFormerGAN_SE_16K"
 
 # ClearVoice() 调用时会覆盖 input_path；此处不再指向样例池。
 input_path: ""

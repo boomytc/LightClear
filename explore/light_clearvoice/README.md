@@ -19,7 +19,7 @@ uv pip install -e .
 
 ## Demo（按能力组织，顶部 `DEVICE` 控制设备并自动回退 CPU）
 
-每个脚本对应一项独立能力，顶部通过全局 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 指定目标设备（支持 `auto` / `cuda` / `cuda:0` / `mps` / `cpu`），目标加速器不可用时打印警告并自动回退到 `cpu`；同时支持通过 `LIGHTCLEAR_MODEL_ROOT` 指定中心权重根目录（默认 `/Users/boom/Model`）。脚本底部均并列附真实硬件实测输出注释。
+每个脚本对应一项独立能力，顶部通过全局 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 指定目标设备（支持 `auto` / `cuda` / `cuda:0` / `mps` / `cpu`），目标加速器不可用时打印警告并自动回退到 `cpu`；同时支持通过 `LIGHTCLEAR_MODEL_ROOT` 指定中心权重根目录（默认 `~/Model`，本机即 `/Users/boom/Model`）。脚本底部均并列附真实硬件实测输出注释。
 
 | 脚本 | 对应能力 / 模型 | `auto` 优先级与设备说明 |
 | --- | --- | --- |

@@ -38,5 +38,5 @@
 
 - `demo/demo_*.py` 脚本保持单文件独立实现，不封装任何函数，包括 `main`。
 - 顺序：import → 全局关键参数 → 设备解析与回退 → 模型加载 → 输入构造 → 推理调用 → 结果输出 → 底部 `#` 多硬件实测输出注释。
-- 关键路径、模型名、任务名、设备名（`DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")`）、输入文件、输出路径、采样率使用全局变量放在文件顶部；样例路径通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `/Users/boom/Model`）。
+- 关键路径、模型名、任务名、设备名（`DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")`）、输入文件、输出路径、采样率使用全局变量放在文件顶部；样例路径通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导，中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `~/Model`，本机即 `/Users/boom/Model`）。
 - 要体现该模块公共入口的真实使用方式，不把核心逻辑藏到包装层；支持 MPS 的模型 `auto` 走 `cuda > mps > cpu`，不支持 MPS 的模型 `auto` 走 `cuda > cpu`；目标加速器不可用（或不支持 MPS 的模型指定 `mps`）时打印明确警告并回退 `cpu`；缺权重或无效 `DEVICE` 值仍显式抛错。

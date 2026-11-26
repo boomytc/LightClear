@@ -18,7 +18,7 @@ from inworld.voice_isolation import scan
 
 # 全局关键参数
 DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")  # 可选: "auto" / "cuda" / "cuda:0" / "mps" / "cpu"
-MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT", "/Users/boom/Model"))
+MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT") or (Path.home() / "Model"))
 CHECKPOINT_PATH = MODEL_ROOT / "SE" / "inworld-voice-isolator" / "denoiser.safetensors"
 INPUT_16K = REPO_ROOT / "assets" / "audio" / "noisy" / "input.wav"
 INPUT_LONG = REPO_ROOT / "assets" / "audio" / "noisy" / "speech1.wav"

@@ -23,7 +23,7 @@
   - `denoiser_realtime.safetensors`（流式 `voice-isolator-v1-realtime`，58.18M）
 - 模型索引见 `docs/模型列表.md`；完整模型规格、能力边界与实测数据见 `docs/models/inworld-voice-isolator.md`。
 - 共享样例使用仓库根 `assets/audio/`（demo 通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台解析），不要在本模块再拷一份共享音频。
-- Demo 按能力平铺在 `demo/` 下（6 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`，落到 CPU 时提示性能限制并在 macOS 限 2 线程）；中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `/Users/boom/Model`）；输出按实际设备写入本模块 `outputs/{cuda,mps,cpu}/`。
+- Demo 按能力平铺在 `demo/` 下（6 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（默认 `cuda > mps > cpu`，目标加速器不可用时警告并回退 `cpu`，落到 CPU 时提示性能限制并在 macOS 限 2 线程）；中心权重根支持 `LIGHTCLEAR_MODEL_ROOT`（默认 `~/Model`，本机即 `/Users/boom/Model`）；输出按实际设备写入本模块 `outputs/{cuda,mps,cpu}/`。
 
 ## Runtime Rules
 

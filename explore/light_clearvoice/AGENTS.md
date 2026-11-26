@@ -24,7 +24,7 @@
   - SR：`/Users/boom/Model/SR/<ModelName>`
 - 推理配置在 `third_party/clearvoice/config/inference/`，其中 `checkpoint_dir` 必须与中心目录约定一致。yaml 里的 `input_path` / `output_dir` 只是配置占位，真正输入输出由 `ClearVoice(...)` 调用参数决定。
 - 共享样例使用仓库根 `assets/`（demo 通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台解析，`.scp` 清单在 `dataloader/misc.py` 内自动做跨平台路径映射）。不要在本模块再拷一份共享 wav。
-- Demo 按能力平铺在 `demo/` 下（8 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（支持 MPS 的模型走 `cuda > mps > cpu`，不支持 MPS 的模型走 `cuda > cpu`，目标加速器不可用时警告并回退 `cpu`）；`ClearVoice(...)` 已支持可选 `device` 与 `checkpoint_dir` 参数及 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `/Users/boom/Model`）。输出按实际设备写入本模块 `outputs/{cpu,mps,cuda}/`。
+- Demo 按能力平铺在 `demo/` 下（8 个单文件顶层脚本），顶部通过 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 控制设备（支持 MPS 的模型走 `cuda > mps > cpu`，不支持 MPS 的模型走 `cuda > cpu`，目标加速器不可用时警告并回退 `cpu`）；`ClearVoice(...)` 已支持可选 `device` 与 `checkpoint_dir` 参数及 `LIGHTCLEAR_MODEL_ROOT` 环境变量（默认 `~/Model`，本机即 `/Users/boom/Model`）。输出按实际设备写入本模块 `outputs/{cpu,mps,cuda}/`。
 - 稳定产品入口在 `../../products/<product_name>/`。不要在本模块内新增产品运行时代码。
 - TSE 人脸检测权重 `third_party/clearvoice/models/av_mossformer2_tse/faceDetector/s3fd/sfd_face.pth` 不纳入版本控制。上游 S3FD 从该文件旁的 `__file__` 加载，不在 `checkpoint_dir` 里。缺文件时 `ClearVoice` 仍可导入，构造人脸检测器会直接失败，不要 `gdown`。SE / SS / SR 单工具产品与 `speech_clarity_web` 不跑 TSE，不必拷这份权重。TSE 网络权重仍走 `/Users/boom/Model/SE/AV_MossFormer2_TSE_16K`。
 

@@ -19,7 +19,7 @@ from clearvoice import ClearVoice
 DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")  # 可选: "auto" / "cuda" / "cuda:0" / "mps" / "cpu"
 TASK_NAME = "speech_super_resolution"
 MODEL_NAME = "MossFormer2_SR_48K"
-MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT", "/Users/boom/Model"))
+MODEL_ROOT = Path(os.environ.get("LIGHTCLEAR_MODEL_ROOT") or (Path.home() / "Model"))
 CHECKPOINT_DIR = MODEL_ROOT / "SR" / MODEL_NAME
 INPUT_AUDIO = REPO_ROOT / "assets" / "audio" / "bandlimited" / "input_sr.wav"
 INPUT_DIR = REPO_ROOT / "assets" / "audio" / "bandlimited"
