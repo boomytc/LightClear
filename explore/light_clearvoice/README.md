@@ -17,41 +17,38 @@ uv venv --python 3.12
 uv pip install -e .
 ```
 
-## Demo（按实际可用硬件拆分为 `cpu` / `mps` / `cuda`）
+## Demo（按能力组织，顶部 `DEVICE` 控制设备并自动回退 CPU）
 
-为了给产品落地提供真实参考，仅在对应硬件上耗时和内存具备实用价值的模型才建立对应脚本（因此各硬件目录下脚本数不对等）；所有脚本底部均附真实硬件实测输出注释，支持通过 `LIGHTCLEAR_MODEL_ROOT` 指定中心权重根目录（默认 `/Users/boom/Model`）。
+每个脚本对应一项独立能力，顶部通过全局 `DEVICE = os.environ.get("LIGHTCLEAR_DEVICE", "auto")` 指定目标设备（支持 `auto` / `cuda` / `cuda:0` / `mps` / `cpu`），目标加速器不可用时打印警告并自动回退到 `cpu`；同时支持通过 `LIGHTCLEAR_MODEL_ROOT` 指定中心权重根目录（默认 `/Users/boom/Model`）。脚本底部均并列附真实硬件实测输出注释。
 
-| 硬件目录 | 包含脚本 | 裁剪说明 |
+| 脚本 | 对应能力 / 模型 | `auto` 优先级与设备说明 |
 | --- | --- | --- |
-| `demo/cpu/`（5 个） | `demo_se.py`、`demo_Numpy2Numpy.py`、`demo_frcrn_se.py`、`demo_tensor2tensor.py`、`demo_sr.py` | 剔除 CPU 过慢的重模型 `MossFormer2_SS_16K`（RTF ~8.9）、`MossFormerGAN_SE_16K`（RTF ~6.6）与 `AV_MossFormer2_TSE_16K` |
-| `demo/mps/`（4 个） | `demo_se.py`、`demo_Numpy2Numpy.py`、`demo_sr.py`、`demo_ss.py` | 剔除 MPS 反比 CPU 慢的 `FRCRN_SE_16K`、显存/耗时过重的 `MossFormerGAN_SE_16K`（L4 峰值 7.8 GiB）与重视频链路 `AV_MossFormer2_TSE_16K` |
-| `demo/cuda/`（8 个） | 全部 8 个脚本（含 `demo_se` / `demo_frcrn_se` / `demo_mossformergan_se` / `demo_ss` / `demo_sr` / `demo_tse` / `demo_Numpy2Numpy` / `demo_tensor2tensor`） | 显式使用 `cuda:0`，含冷启动/稳态计时与峰值显存统计 |
+| `demo/demo_se.py` | 48 kHz 语音增强（`MossFormer2_SE_48K`） | `cuda > mps > cpu` |
+| `demo/demo_Numpy2Numpy.py` | 内存 NumPy 音频输入输出（`MossFormer2_SE_48K`） | `cuda > mps > cpu` |
+| `demo/demo_ss.py` | 16 kHz 双人说话人分离（`MossFormer2_SS_16K`） | `cuda > mps > cpu`（CPU 较慢，落到 CPU 时打印性能提示） |
+| `demo/demo_sr.py` | 48 kHz 语音超分辨率（`MossFormer2_SR_48K`） | `cuda > mps > cpu` |
+| `demo/demo_frcrn_se.py` | 16 kHz 语音增强（`FRCRN_SE_16K`） | `cuda > cpu`（MPS 实测性能退化，指定 `mps` 自动回退 `cpu`） |
+| `demo/demo_tensor2tensor.py` | NumPy / Torch Tensor 输入对比（`FRCRN_SE_16K`） | `cuda > cpu`（MPS 实测性能退化，指定 `mps` 自动回退 `cpu`） |
+| `demo/demo_mossformergan_se.py` | 16 kHz GAN 语音增强（`MossFormerGAN_SE_16K`） | `cuda > cpu`（MPS/CPU 过重，落到 CPU 时打印性能提示） |
+| `demo/demo_tse.py` | 16 kHz 音视频目标说话人提取（`AV_MossFormer2_TSE_16K`） | `cuda > cpu`（重视频链路，落到 CPU 时打印性能提示） |
 
 从本模块目录运行示例：
 
 ```bash
-# CPU（通用基线）
-.venv/bin/python demo/cpu/demo_se.py
-.venv/bin/python demo/cpu/demo_frcrn_se.py
-.venv/bin/python demo/cpu/demo_sr.py
-.venv/bin/python demo/cpu/demo_Numpy2Numpy.py
-.venv/bin/python demo/cpu/demo_tensor2tensor.py
+# 默认按能力自动选择最优可用设备（支持 MPS 的脚本走 cuda > mps > cpu，其余走 cuda > cpu）
+.venv/bin/python demo/demo_se.py
+.venv/bin/python demo/demo_frcrn_se.py
+.venv/bin/python demo/demo_mossformergan_se.py
+.venv/bin/python demo/demo_ss.py
+.venv/bin/python demo/demo_sr.py
+.venv/bin/python demo/demo_tse.py
+.venv/bin/python demo/demo_Numpy2Numpy.py
+.venv/bin/python demo/demo_tensor2tensor.py
 
-# Apple Silicon MPS（需 macOS arm64）
-.venv/bin/python demo/mps/demo_se.py
-.venv/bin/python demo/mps/demo_ss.py
-.venv/bin/python demo/mps/demo_sr.py
-.venv/bin/python demo/mps/demo_Numpy2Numpy.py
-
-# NVIDIA CUDA（需 NVIDIA GPU）
-.venv/bin/python demo/cuda/demo_se.py
-.venv/bin/python demo/cuda/demo_frcrn_se.py
-.venv/bin/python demo/cuda/demo_mossformergan_se.py
-.venv/bin/python demo/cuda/demo_ss.py
-.venv/bin/python demo/cuda/demo_sr.py
-.venv/bin/python demo/cuda/demo_tse.py
-.venv/bin/python demo/cuda/demo_Numpy2Numpy.py
-.venv/bin/python demo/cuda/demo_tensor2tensor.py
+# 按需通过环境变量或直接修改脚本顶部 DEVICE 切换设备（目标加速器不可用时自动警告回退 cpu）
+LIGHTCLEAR_DEVICE=cpu .venv/bin/python demo/demo_se.py
+LIGHTCLEAR_DEVICE=mps .venv/bin/python demo/demo_se.py
+LIGHTCLEAR_DEVICE=cuda:0 .venv/bin/python demo/demo_se.py
 ```
 
 ### 实测单文件稳态耗时速览

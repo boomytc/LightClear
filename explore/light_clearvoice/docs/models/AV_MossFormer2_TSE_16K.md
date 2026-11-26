@@ -33,7 +33,7 @@ cv = ClearVoice(task="target_speaker_extraction", model_names=["AV_MossFormer2_T
 
 ## 硬件实测（`001.avi`，25 fps / 8.040 s）
 
-- 本模型为 700 MB 音视频重链路（含 `ffmpeg` 解帧/重封装 + `scenedetect` + S3FD 人脸检测 + AV-MossFormer2），仅保留 `demo/cuda/demo_tse.py` 作为 GPU 服务端参考（已同步修复上游 `scenedetect >= 0.6.7` 的 `open_video` 兼容以及 `av_mossformer2.py` 中硬编码 `.cuda()`）。
+- 本模型为 700 MB 音视频重链路（含 `ffmpeg` 解帧/重封装 + `scenedetect` + S3FD 人脸检测 + AV-MossFormer2），`demo/demo_tse.py` 默认走 `cuda > cpu`（不启用 MPS，回退 CPU 时打印性能提示；已同步修复上游 `scenedetect >= 0.6.7` 的 `open_video` 兼容以及 `av_mossformer2.py` 中硬编码 `.cuda()`）。
 - Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，`cuda:0`）：加载 `3.936 s`，单视频端到端冷启动 `24.888 s` / 稳态 `21.805 s`（RTF `2.7121`，耗时主要在 `ffmpeg`/OpenCV 编解码），峰值显存 `allocated=661.7 MiB, reserved=754.0 MiB`。
 
 ## 人脸检测权重
