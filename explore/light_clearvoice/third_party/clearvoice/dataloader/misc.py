@@ -16,6 +16,11 @@ import mimetypes
 
 
 def _resolve_scp_entry(scp_path, raw_path):
+    entry = Path(raw_path)
+    if not entry.is_absolute():
+        candidate = (Path(scp_path).resolve().parent / entry).resolve()
+        if candidate.exists():
+            return str(candidate)
     if os.path.exists(raw_path):
         return raw_path
     marker = "/assets/"

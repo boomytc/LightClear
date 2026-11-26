@@ -9,7 +9,12 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 FORBIDDEN_ROOT_PATHS = ("pyproject.toml", "demo", "third_party", "models")
 FORBIDDEN_SUFFIXES = (".pth", ".bk", ".pkf", ".th", ".safetensors")
 SKIP_PARTS = {"third_party", ".venv", "__pycache__", ".git"}
-REQUIRED_EXPLORE = ("explore/light_clearvoice", "explore/light_demucs")
+REQUIRED_EXPLORE = (
+    "explore/light_clearvoice",
+    "explore/light_demucs",
+    "explore/light_voice_isolator",
+)
+FORBIDDEN_DEMO_SUBDIRS = ("cpu", "mps", "cuda")
 REQUIRED_PRODUCTS = (
     "products/speech_clarity_web",
     "products/speech_enhance_web",
@@ -74,6 +79,10 @@ def main() -> None:
     for relative in REQUIRED_EXPLORE:
         if not (REPO_ROOT / relative / "pyproject.toml").is_file():
             fail(f"missing explore family {relative}")
+        for subdir in FORBIDDEN_DEMO_SUBDIRS:
+            stale_demo_dir = REPO_ROOT / relative / "demo" / subdir
+            if stale_demo_dir.exists():
+                fail(f"retired hardware demo subdir still exists: {relative}/demo/{subdir}")
 
     for relative in REQUIRED_PRODUCTS:
         if not (REPO_ROOT / relative / "pyproject.toml").is_file():
@@ -92,6 +101,12 @@ def main() -> None:
         text = path.read_text(encoding="utf-8")
         if "parents[3]" in text:
             fail(f"{relative} still uses parents[3] (old repo-root launch)")
+        if relative.startswith("explore/") and "/demo/" in relative:
+            code_only = "\n".join(
+                line for line in text.splitlines() if not line.lstrip().startswith("#")
+            )
+            if "/Users/boom/" in code_only:
+                fail(f"{relative} still contains hardcoded /Users/boom/ path in executable code")
         if repo_third_party in text:
             fail(f"{relative} references repo-root third_party")
         if relative.startswith("products/vocal_isolate_web/") and "speaker-" in text:
@@ -123,6 +138,10 @@ def main() -> None:
         path = REPO_ROOT / relative
         if not path.is_file():
             continue
+        if relative.startswith("assets/manifests/") and relative.endswith(".scp"):
+            scp_text = path.read_text(encoding="utf-8")
+            if "/Users/boom/" in scp_text:
+                fail(f"{relative} still contains hardcoded /Users/boom/ path")
         if relative.endswith((".py", ".md", ".yaml", ".yml", ".html", ".js", ".toml")):
             text = path.read_text(encoding="utf-8")
             # third_party is skipped by iter_tracked_files, so the vendored loader

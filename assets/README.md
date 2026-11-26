@@ -11,7 +11,7 @@ assets/
   audio/bandlimited/    # 带限语音，供超分辨率
   audio/music/          # 带伴奏混合，供人声隔离 / 四轨 / 六轨
   video/speech/         # 含人脸与语音的视频，供目标说话人提取
-  manifests/            # 批处理 .scp 清单，路径为绝对路径
+  manifests/            # 批处理 .scp 清单，路径相对 manifests/ 目录
 ```
 
 ## 分类规则
@@ -23,7 +23,7 @@ assets/
 
 ## 使用规则
 
-- Demo / CLI 顶部显式写出绝对路径，例如 `/Users/boom/workspace/LightClear/assets/audio/noisy/input.wav`。
+- Demo 顶部通过 `MODULE_ROOT.parent.parent / "assets"` 跨平台推导样例路径（不要硬编码本机绝对路径）；`manifests/*.scp` 使用相对 `manifests/` 的路径（如 `../audio/noisy/input.wav`），由加载器按 `.scp` 所在目录解析。
 - 批量输入优先用 `manifests/*.scp`。ClearVoice 目录输入会处理该目录下全部文件；多于 scp 的 noisy / bandlimited / video 文件、以及没有 scp 的 music 文件，见「不进 scp 的额外样例」。
 - 不要把本目录当作产品默认样例池去 `glob`。
 
