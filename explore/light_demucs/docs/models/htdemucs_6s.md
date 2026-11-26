@@ -42,9 +42,14 @@ separator = Separator(model="htdemucs_6s", repo=Path("models/htdemucs_6s"), devi
 origin, stems = separator.separate_audio_file("track.mp3")
 ```
 
+## 硬件实测（`next_station_heaven.mp3`，30.041 s，`shifts=1, overlap=0.25, segment=7`）
+
+- Apple M4 Pro CPU（PyTorch 2.13.0）：`7.338 s`（RTF `0.2443`，`4.09x`）。
+- Apple M4 Pro MPS（PyTorch 2.13.0）：冷启动 `2.894 s` / 稳态 `2.670 s`（RTF `0.0889`，`11.25x`）。确定性模式（`shifts=0`）与 CPU 最大误差 `3.23e-06`（RMS `2.09e-07`），无 NaN。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，CUDA 13.2，`cuda:0`）：冷启动 `1.383 s` / 稳态 `0.834 s`（RTF `0.0278`，`36.01x`）；峰值显存 `allocated=583.3 MiB, reserved=752.0 MiB`。
+
 ## 未验证/待确认
 
 - 钢琴轨质量按上游说明视为实验性，本模块不把它当可交付指标。
 - 共享样例 `next_station_heaven.mp3` 上 guitar / piano 能量极低，只证明六轨合同能跑，不证明这两轨在该曲上可听。
-- MPS / CUDA 速度与数值未在本模块文档中核验。
 - 默认 demo 使用 `assets/audio/music/next_station_heaven.mp3`（带唱 30 秒，仅供本机演示）。

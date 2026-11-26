@@ -1,11 +1,24 @@
 from __future__ import annotations
 
+import ast
 import py_compile
 from pathlib import Path
 
 
 MODULE_ROOT = Path(__file__).resolve().parents[1]
 IMPORT_LINE = "from demucs.api import Separator"
+REQUIRED_BACKENDS = ("cpu", "mps", "cuda")
+REQUIRED_DEMOS = {
+    "demo_vocals.py",
+    "demo_stems.py",
+    "demo_htdemucs_ft.py",
+    "demo_htdemucs_6s.py",
+}
+EXPECTED_DEVICE_LITERALS = {
+    "cpu": 'DEVICE = "cpu"',
+    "mps": 'DEVICE = "mps"',
+    "cuda": 'DEVICE = "cuda:0"',
+}
 
 
 def load_separator_name() -> str:
@@ -25,34 +38,41 @@ def load_separator_name() -> str:
 
 def compile_demos() -> list[str]:
     demo_dir = MODULE_ROOT / "demo"
-    demo_files = sorted(demo_dir.glob("demo_*.py"))
-    if not demo_files:
-        raise AssertionError(f"no demo scripts in {demo_dir}")
+    stray_top = sorted(demo_dir.glob("demo_*.py"))
+    if stray_top:
+        raise AssertionError(f"unexpected top-level demos in {demo_dir}: {[p.name for p in stray_top]}")
+
     names: list[str] = []
-    for path in demo_files:
-        py_compile.compile(str(path), doraise=True)
-        text = path.read_text(encoding="utf-8")
-        names.append(path.name)
-        if IMPORT_LINE not in text:
-            raise AssertionError(f"{path.name} missing {IMPORT_LINE!r}")
-        if "def " in text:
-            raise AssertionError(f"{path.name} must not define functions")
-        if path.name == "demo_htdemucs_ft.py" and 'MODEL_NAME = "htdemucs_ft"' not in text:
-            raise AssertionError("demo_htdemucs_ft.py must pin MODEL_NAME = \"htdemucs_ft\"")
-        if path.name == "demo_htdemucs_6s.py":
-            if 'MODEL_NAME = "htdemucs_6s"' not in text:
-                raise AssertionError("demo_htdemucs_6s.py must pin MODEL_NAME = \"htdemucs_6s\"")
-            if '"guitar"' not in text or '"piano"' not in text:
-                raise AssertionError("demo_htdemucs_6s.py must write guitar and piano stems")
-    required = {
-        "demo_vocals.py",
-        "demo_stems.py",
-        "demo_htdemucs_ft.py",
-        "demo_htdemucs_6s.py",
-    }
-    missing = sorted(required.difference(names))
-    if missing:
-        raise AssertionError(f"missing demo scripts: {missing}")
+    for backend in REQUIRED_BACKENDS:
+        backend_dir = demo_dir / backend
+        demo_files = sorted(backend_dir.glob("demo_*.py"))
+        if not demo_files:
+            raise AssertionError(f"no demo scripts in {backend_dir}")
+        backend_names: set[str] = set()
+        for path in demo_files:
+            py_compile.compile(str(path), doraise=True)
+            text = path.read_text(encoding="utf-8")
+            rel_name = f"{backend}/{path.name}"
+            names.append(rel_name)
+            backend_names.add(path.name)
+            if IMPORT_LINE not in text:
+                raise AssertionError(f"{rel_name} missing {IMPORT_LINE!r}")
+            if EXPECTED_DEVICE_LITERALS[backend] not in text:
+                raise AssertionError(f"{rel_name} must pin {EXPECTED_DEVICE_LITERALS[backend]!r}")
+            tree = ast.parse(text, filename=str(path))
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    raise AssertionError(f"{rel_name} must not define functions (found {node.name!r})")
+            if path.name == "demo_htdemucs_ft.py" and 'MODEL_NAME = "htdemucs_ft"' not in text:
+                raise AssertionError(f"{rel_name} must pin MODEL_NAME = \"htdemucs_ft\"")
+            if path.name == "demo_htdemucs_6s.py":
+                if 'MODEL_NAME = "htdemucs_6s"' not in text:
+                    raise AssertionError(f"{rel_name} must pin MODEL_NAME = \"htdemucs_6s\"")
+                if '"guitar"' not in text or '"piano"' not in text:
+                    raise AssertionError(f"{rel_name} must write guitar and piano stems")
+        missing = sorted(REQUIRED_DEMOS.difference(backend_names))
+        if missing:
+            raise AssertionError(f"missing {backend} demo scripts: {missing}")
     return names
 
 
@@ -76,6 +96,7 @@ def main() -> None:
     demos = compile_demos()
     installer = compile_installer()
     print(f"import_name={name}")
+    print(f"demo_count={len(demos)}")
     print("demos=" + ",".join(demos))
     print(f"installer={installer}")
 

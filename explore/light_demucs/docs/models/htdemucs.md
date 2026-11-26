@@ -42,9 +42,14 @@ separator = Separator(model="htdemucs", repo=Path("models/htdemucs"), device="cp
 origin, stems = separator.separate_audio_file("track.mp3")
 ```
 
+## 硬件实测（`next_station_heaven.mp3`，30.041 s，`shifts=1, overlap=0.25, segment=7`）
+
+- Apple M4 Pro CPU（PyTorch 2.13.0）：人声隔离 `7.643 s`（RTF `0.2544`，`3.93x`），四轨 `8.141 s`（RTF `0.2710`，`3.69x`）。
+- Apple M4 Pro MPS（PyTorch 2.13.0）：人声隔离冷启动 `3.256 s` / 稳态 `2.427 s`（RTF `0.0808`，`12.38x`）；四轨冷启动 `2.747 s` / 稳态 `2.210 s`（RTF `0.0736`，`13.59x`）。确定性模式（`shifts=0`）与 CPU 最大误差 `7.39e-06`（RMS `3.76e-07`），无 NaN。
+- Colab NVIDIA L4 CUDA（PyTorch 2.15.0+cu132，CUDA 13.2，`cuda:0`）：人声隔离冷启动 `1.699 s` / 稳态 `0.890 s`（RTF `0.0296`，`33.74x`）；四轨稳态 `0.869 s`（RTF `0.0289`，`34.59x`）；峰值显存 `allocated=546.8 MiB, reserved=770.0 MiB`。
+
 ## 未验证/待确认
 
 - 本机 CPU 完整推理时长随曲长变化，未作为门禁。
-- MPS / CUDA 速度与数值未在本模块文档中核验。
 - 仓库样例 `assets/audio/music/test.mp3` 是上游烟雾片段，人声轨能量很低。
 - 默认 demo 使用 `assets/audio/music/next_station_heaven.mp3`（带唱 30 秒，仅供本机演示）。
